@@ -6,6 +6,7 @@ import { User, Settings, LogOut, BookOpen, Heart, Bell, ChevronRight, LogIn, Use
 import { motion } from 'motion/react';
 import { supabase } from '@/lib/supabase';
 import type { User as SupabaseUser } from '@supabase/supabase-js';
+import { PromoBanners } from '@/components/PromoBanners';
 
 export default function ProfilePage() {
   const [user, setUser] = useState<SupabaseUser | null>(null);
@@ -130,6 +131,8 @@ export default function ProfilePage() {
               </motion.button>
             ))}
           </div>
+
+          <PromoBanners />
 
           {/* Logout Button */}
           <button
