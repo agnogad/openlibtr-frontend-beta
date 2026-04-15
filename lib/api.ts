@@ -43,6 +43,32 @@ export interface ProxyConfig {
 
 const BASE_URL = 'https://raw.githubusercontent.com/agnogad/openlibtr/main';
 
+// Cache Implementation
+interface CacheEntry<T> {
+  data: T;
+  timestamp: number;
+}
+
+const cache = new Map<string, CacheEntry<any>>();
+const CACHE_DURATION = 5 * 60 * 1000; // 5 minutes in milliseconds
+
+async function fetchWithCache<T>(url: string, isText: boolean = false): Promise<T> {
+  const now = Date.now();
+  const cached = cache.get(url);
+
+  if (cached && (now - cached.timestamp < CACHE_DURATION)) {
+    return cached.data;
+  }
+
+  const response = await fetch(url);
+  if (!response.ok) throw new Error(`Failed to fetch: ${url}`);
+  
+  const data = isText ? await response.text() : await response.json();
+  
+  cache.set(url, { data, timestamp: now });
+  return data;
+}
+
 function getProxiedUrl(url: string): string {
   if (typeof window === 'undefined') return url;
   
@@ -68,23 +94,17 @@ function getProxiedUrl(url: string): string {
 
 export async function fetchLibrary(): Promise<Novel[]> {
   const url = getProxiedUrl(`${BASE_URL}/library.json`);
-  const response = await fetch(url);
-  if (!response.ok) throw new Error('Failed to fetch library');
-  return response.json();
+  return fetchWithCache<Novel[]>(url);
 }
 
 export async function fetchNovelConfig(slug: string): Promise<NovelConfig> {
   const url = getProxiedUrl(`${BASE_URL}/books/${slug}/config.json`);
-  const response = await fetch(url);
-  if (!response.ok) throw new Error('Failed to fetch novel config');
-  return response.json();
+  return fetchWithCache<NovelConfig>(url);
 }
 
 export async function fetchChapterContent(slug: string, path: string): Promise<string> {
   const url = getProxiedUrl(`${BASE_URL}/books/${slug}/${path}`);
-  const response = await fetch(url);
-  if (!response.ok) throw new Error('Failed to fetch chapter content');
-  return response.text();
+  return fetchWithCache<string>(url, true);
 }
 
 export function getCoverUrl(slug: string): string {

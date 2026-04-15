@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, use } from 'react';
+import { useState, useEffect } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { ChevronLeft, ChevronRight, List, Calendar, BookOpen, Search, Play } from 'lucide-react';
@@ -8,8 +8,13 @@ import { NovelConfig, fetchNovelConfig, getCoverUrl, getHistory, ReadingHistory 
 import { motion } from 'motion/react';
 import { cn } from '@/lib/utils';
 
-export default function NovelDetailPage({ params }: { params: Promise<{ slug: string }> }) {
-  const { slug } = use(params);
+interface NovelDetailViewProps {
+  slug: string;
+  onNavigate: (view: string, params?: any) => void;
+  history: ReadingHistory[];
+}
+
+export function NovelDetailView({ slug, onNavigate, history }: NovelDetailViewProps) {
   const [config, setConfig] = useState<NovelConfig | null>(null);
   const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState('');
@@ -18,14 +23,9 @@ export default function NovelDetailPage({ params }: { params: Promise<{ slug: st
   useEffect(() => {
     async function loadData() {
       try {
-        const [novelConfig, history] = await Promise.all([
-          fetchNovelConfig(slug),
-          getHistory()
-        ]);
-        
+        const novelConfig = await fetchNovelConfig(slug);
         setConfig(novelConfig);
         
-        // Find last read chapter for this novel
         const novelHistory = history.find(item => item.slug === slug);
         if (novelHistory) {
           setLastReadChapterId(novelHistory.chapterId);
@@ -37,7 +37,7 @@ export default function NovelDetailPage({ params }: { params: Promise<{ slug: st
       }
     }
     loadData();
-  }, [slug]);
+  }, [slug, history]);
 
   const filteredChapters = config?.chapters.filter(chapter => 
     chapter.id.toString().includes(searchQuery) || 
@@ -46,7 +46,7 @@ export default function NovelDetailPage({ params }: { params: Promise<{ slug: st
 
   if (loading) {
     return (
-      <div className="flex flex-col items-center justify-center min-h-[60vh] gap-4">
+      <div className="flex flex-col items-center justify-center min-h-[60vh] gap-6">
         <div className="w-12 h-12 border-4 border-primary border-t-transparent rounded-full animate-spin" />
         <p className="text-muted-foreground animate-pulse">Novel detayları yükleniyor...</p>
       </div>
@@ -57,22 +57,24 @@ export default function NovelDetailPage({ params }: { params: Promise<{ slug: st
     return (
       <div className="text-center py-20">
         <p className="text-muted-foreground text-lg">Novel bulunamadı.</p>
-        <Link href="/" className="text-primary hover:underline mt-4 inline-block">Kütüphaneye Dön</Link>
+        <button onClick={() => onNavigate('LIBRARY')} className="text-primary hover:underline mt-4 inline-block">Kütüphaneye Dön</button>
       </div>
     );
   }
 
   return (
     <div className="space-y-12 pb-20">
-      <Link href="/" className="inline-flex items-center gap-2.5 text-[11px] font-bold uppercase tracking-[0.2em] text-[#8E8E93] hover:text-white transition-all group">
+      <button 
+        onClick={() => onNavigate('LIBRARY')} 
+        className="inline-flex items-center gap-2.5 text-[11px] font-bold uppercase tracking-[0.2em] text-[#8E8E93] hover:text-white transition-all group"
+      >
         <div className="p-2 rounded-xl bg-white/5 border border-white/5 group-hover:bg-white/10 transition-all">
           <ChevronLeft className="w-4 h-4" />
         </div>
         <span>Kütüphaneye Dön</span>
-      </Link>
+      </button>
 
       <div className="flex flex-col lg:flex-row gap-12">
-        {/* Left Column: Cover & Quick Actions */}
         <div className="w-full lg:w-80 shrink-0 space-y-8">
           <motion.div 
             initial={{ opacity: 0, scale: 0.95 }}
@@ -96,18 +98,17 @@ export default function NovelDetailPage({ params }: { params: Promise<{ slug: st
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.2 }}
             >
-              <Link
-                href={`/novel/${slug}/${lastReadChapterId}`}
+              <button
+                onClick={() => onNavigate('READER', { slug, chapterId: lastReadChapterId })}
                 className="flex items-center justify-center gap-3 w-full py-5 rounded-[2rem] bg-primary text-white font-black uppercase tracking-widest text-xs shadow-xl shadow-primary/20 hover:scale-[1.02] active:scale-[0.98] transition-all"
               >
                 <Play className="w-4 h-4 fill-current" />
                 <span>Kaldığın Yerden Devam Et</span>
-              </Link>
+              </button>
             </motion.div>
           )}
         </div>
 
-        {/* Right Column: Info & Chapters */}
         <div className="flex-1 space-y-12">
           <div className="space-y-6">
             <motion.div
@@ -164,10 +165,10 @@ export default function NovelDetailPage({ params }: { params: Promise<{ slug: st
                     animate={{ opacity: 1, x: 0 }}
                     transition={{ delay: index * 0.02 }}
                   >
-                    <Link
-                      href={`/novel/${slug}/${chapter.id}`}
+                    <button
+                      onClick={() => onNavigate('READER', { slug, chapterId: chapter.id })}
                       className={cn(
-                        "flex items-center justify-between p-5 rounded-2xl border transition-all group",
+                        "w-full flex items-center justify-between p-5 rounded-2xl border transition-all group",
                         isRead 
                           ? "bg-primary/5 border-primary/20 hover:bg-primary/10" 
                           : "bg-[#121212] border-white/5 hover:bg-[#1c1c1e] hover:border-white/10"
@@ -180,7 +181,7 @@ export default function NovelDetailPage({ params }: { params: Promise<{ slug: st
                         )}>
                           {chapter.id}
                         </div>
-                        <div className="space-y-0.5">
+                        <div className="space-y-0.5 text-left">
                           <span className={cn(
                             "text-sm font-bold transition-colors",
                             isRead ? "text-primary" : "text-white group-hover:text-primary"
@@ -196,7 +197,7 @@ export default function NovelDetailPage({ params }: { params: Promise<{ slug: st
                         "w-5 h-5 transition-all group-hover:translate-x-1",
                         isRead ? "text-primary/60" : "text-[#444] group-hover:text-primary"
                       )} />
-                    </Link>
+                    </button>
                   </motion.div>
                 );
               })}
