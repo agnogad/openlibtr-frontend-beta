@@ -74,8 +74,8 @@ export function Navbar() {
       </nav>
 
       {/* Bottom Tab Bar (Mobile Only) */}
-      <nav className="fixed bottom-0 left-0 right-0 z-50 md:hidden bg-[#121212]/80 backdrop-blur-2xl border-t border-white/10">
-        <div className="flex items-center justify-around h-16">
+      <nav className="fixed bottom-0 left-0 right-0 z-50 md:hidden bg-[#121212]/80 backdrop-blur-2xl border-t border-white/10 pb-[env(safe-area-inset-bottom)]">
+        <div className="grid grid-cols-3 h-16 max-w-5xl mx-auto px-2">
           {navItems.map((item) => {
             const Icon = item.icon;
             const isActive = pathname === item.href;
@@ -84,7 +84,7 @@ export function Navbar() {
                 key={item.href}
                 href={item.href}
                 className={cn(
-                  "flex flex-col items-center gap-1 text-[10px] font-medium transition-colors",
+                  "flex flex-col items-center justify-center gap-1 text-[10px] font-medium transition-colors w-full h-full",
                   isActive ? "text-primary" : "text-[#8E8E93] hover:text-white"
                 )}
               >
