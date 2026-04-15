@@ -7,6 +7,7 @@ import { motion } from 'motion/react';
 import { supabase } from '@/lib/supabase';
 import type { User as SupabaseUser } from '@supabase/supabase-js';
 import { PromoBanners } from '@/components/PromoBanners';
+import { cn } from '@/lib/utils';
 
 export default function ProfilePage() {
   const [user, setUser] = useState<SupabaseUser | null>(null);
@@ -30,6 +31,36 @@ export default function ProfilePage() {
 
   const handleLogout = async () => {
     await supabase.auth.signOut();
+  };
+
+  const [activeColor, setActiveColor] = useState<string>(() => {
+    if (typeof window !== 'undefined') {
+      return localStorage.getItem('theme-primary-color') || '#007AFF';
+    }
+    return '#007AFF';
+  });
+
+  const themeColors = [
+    { name: 'Mavi', color: '#007AFF' },
+    { name: 'Yeşil', color: '#34C759' },
+    { name: 'Turuncu', color: '#FF9500' },
+    { name: 'Kırmızı', color: '#FF3B30' },
+    { name: 'Mor', color: '#AF52DE' },
+    { name: 'Pembe', color: '#FF2D55' },
+    { name: 'Sarı', color: '#FFCC00' },
+    { name: 'Gri', color: '#8E8E93' },
+  ];
+
+  const changeThemeColor = (color: string) => {
+    setActiveColor(color);
+    localStorage.setItem('theme-primary-color', color);
+    document.documentElement.style.setProperty('--primary', color);
+    document.documentElement.style.setProperty('--accent', color);
+    document.documentElement.style.setProperty('--ring', color);
+    // Also set the Tailwind 4 specific variables just in case
+    document.documentElement.style.setProperty('--color-primary', color);
+    document.documentElement.style.setProperty('--color-accent', color);
+    document.documentElement.style.setProperty('--color-ring', color);
   };
 
   const menuItems = [
@@ -131,6 +162,41 @@ export default function ProfilePage() {
               </motion.button>
             ))}
           </div>
+
+          {/* Theme Settings */}
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.3 }}
+            className="p-6 rounded-3xl bg-[#121212] border border-white/10 space-y-4"
+          >
+            <h3 className="font-bold flex items-center gap-2">
+              <Settings className="w-5 h-5 text-primary" />
+              Tema Rengi
+            </h3>
+            <div className="grid grid-cols-4 sm:grid-cols-8 gap-3">
+              {themeColors.map((theme) => (
+                <button
+                  key={theme.color}
+                  onClick={() => changeThemeColor(theme.color)}
+                  className="group relative flex flex-col items-center gap-2"
+                  title={theme.name}
+                >
+                  <div 
+                    className={cn(
+                      "w-10 h-10 rounded-full border-2 transition-all group-hover:scale-110 group-active:scale-95 flex items-center justify-center",
+                      activeColor === theme.color ? "border-white scale-110 shadow-lg shadow-white/10" : "border-white/10"
+                    )}
+                    style={{ backgroundColor: theme.color }}
+                  >
+                    {activeColor === theme.color && (
+                      <div className="w-2 h-2 rounded-full bg-white shadow-sm" />
+                    )}
+                  </div>
+                </button>
+              ))}
+            </div>
+          </motion.div>
 
           <PromoBanners />
 

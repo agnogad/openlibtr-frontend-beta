@@ -2,7 +2,7 @@
 
 import { useState, useEffect, use } from 'react';
 import Link from 'next/link';
-import { ChevronLeft, ChevronRight, Menu, Home, ArrowLeft } from 'lucide-react';
+import { ChevronLeft, ChevronRight, Menu, Home, ArrowLeft, Settings } from 'lucide-react';
 import { 
   fetchNovelConfig, 
   fetchChapterContent, 
@@ -12,6 +12,7 @@ import {
 } from '@/lib/api';
 import ReactMarkdown from 'react-markdown';
 import { GiscusComments } from '@/components/GiscusComments';
+import { ReaderSettings } from '@/components/ReaderSettings';
 import { motion, AnimatePresence } from 'motion/react';
 
 export default function ReaderPage({ params }: { params: Promise<{ slug: string; chapterId: string }> }) {
@@ -23,7 +24,17 @@ export default function ReaderPage({ params }: { params: Promise<{ slug: string;
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
+  // Reader Settings State
+  const [fontSize, setFontSize] = useState(18);
+  const [fontFamily, setFontFamily] = useState('var(--font-sans)');
+
   useEffect(() => {
+    // Load saved settings
+    const savedSize = localStorage.getItem('reader-font-size');
+    const savedFamily = localStorage.getItem('reader-font-family');
+    if (savedSize) setFontSize(parseInt(savedSize));
+    if (savedFamily) setFontFamily(savedFamily);
+
     async function loadData() {
       setLoading(true);
       setError(null);
@@ -63,6 +74,16 @@ export default function ReaderPage({ params }: { params: Promise<{ slug: string;
     loadData();
   }, [slug, id]);
 
+  const handleSetFontSize = (size: number) => {
+    setFontSize(size);
+    localStorage.setItem('reader-font-size', size.toString());
+  };
+
+  const handleSetFontFamily = (family: string) => {
+    setFontFamily(family);
+    localStorage.setItem('reader-font-family', family);
+  };
+
   const nextChapter = config?.chapters.find(c => c.id === id + 1);
   const prevChapter = config?.chapters.find(c => c.id === id - 1);
 
@@ -92,12 +113,21 @@ export default function ReaderPage({ params }: { params: Promise<{ slug: string;
       {/* Reader Header */}
       <header className="space-y-6 text-center border-b border-white/10 pb-10">
         <div className="flex items-center justify-between mb-6">
-          <Link href={`/novel/${slug}`} className="p-2.5 rounded-full bg-[#1c1c1e] hover:bg-[#2c2c2e] transition-colors border border-white/5">
-            <Menu className="w-5 h-5" />
-          </Link>
-          <Link href="/" className="p-2.5 rounded-full bg-[#1c1c1e] hover:bg-[#2c2c2e] transition-colors border border-white/5">
-            <Home className="w-5 h-5" />
-          </Link>
+          <div className="flex items-center gap-2">
+            <Link href={`/novel/${slug}`} className="p-2.5 rounded-full bg-[#1c1c1e] hover:bg-[#2c2c2e] transition-colors border border-white/5">
+              <Menu className="w-5 h-5" />
+            </Link>
+            <Link href="/" className="p-2.5 rounded-full bg-[#1c1c1e] hover:bg-[#2c2c2e] transition-colors border border-white/5">
+              <Home className="w-5 h-5" />
+            </Link>
+          </div>
+          
+          <ReaderSettings 
+            fontSize={fontSize} 
+            setFontSize={handleSetFontSize} 
+            fontFamily={fontFamily} 
+            setFontFamily={handleSetFontFamily} 
+          />
         </div>
         <h1 className="text-xs font-bold text-primary tracking-[0.2em] uppercase opacity-80">
           {slug.replace(/-/g, ' ')}
@@ -111,6 +141,7 @@ export default function ReaderPage({ params }: { params: Promise<{ slug: string;
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.5 }}
         className="markdown-body prose prose-invert max-w-none text-white/90"
+        style={{ fontSize: `${fontSize}px`, fontFamily: fontFamily }}
       >
         <ReactMarkdown>{content}</ReactMarkdown>
       </motion.article>
