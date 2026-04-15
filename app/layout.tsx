@@ -1,7 +1,7 @@
 import type {Metadata} from 'next';
 import './globals.css';
-import { Navbar } from '@/components/Navbar';
 import { ThemeInitializer } from '@/components/ThemeInitializer';
+import { ClientLayout } from '@/components/ClientLayout';
 
 export const metadata: Metadata = {
   title: 'OpenLibTR - Light Novel Reader',
@@ -13,10 +13,9 @@ export default function RootLayout({children}: {children: React.ReactNode}) {
     <html lang="tr" className="dark">
       <body suppressHydrationWarning className="min-h-screen pt-16 pb-20 md:pb-0">
         <ThemeInitializer />
-        <Navbar />
-        <main className="max-w-5xl mx-auto px-6 md:px-10 py-8">
+        <ClientLayout>
           {children}
-        </main>
+        </ClientLayout>
       </body>
     </html>
   );

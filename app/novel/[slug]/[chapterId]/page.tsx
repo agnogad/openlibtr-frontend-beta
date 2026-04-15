@@ -1,8 +1,9 @@
 'use client';
 
-import { useState, useEffect, use } from 'react';
+import { useState, useEffect, use, useRef } from 'react';
 import Link from 'next/link';
-import { ChevronLeft, ChevronRight, Menu, Home, ArrowLeft, Settings } from 'lucide-react';
+import { useRouter } from 'next/navigation';
+import { ChevronLeft, ChevronRight, Menu, Home, ArrowLeft, Settings, ArrowUp, Clock, List } from 'lucide-react';
 import { 
   fetchNovelConfig, 
   fetchChapterContent, 
@@ -13,16 +14,29 @@ import {
 import ReactMarkdown from 'react-markdown';
 import { GiscusComments } from '@/components/GiscusComments';
 import { ReaderSettings } from '@/components/ReaderSettings';
-import { motion, AnimatePresence } from 'motion/react';
+import { motion, AnimatePresence, useScroll, useSpring } from 'motion/react';
+import { cn } from '@/lib/utils';
 
 export default function ReaderPage({ params }: { params: Promise<{ slug: string; chapterId: string }> }) {
   const { slug, chapterId } = use(params);
   const id = parseInt(chapterId);
+  const router = useRouter();
   
   const [config, setConfig] = useState<NovelConfig | null>(null);
   const [content, setContent] = useState<string>('');
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [readingTime, setReadingTime] = useState(0);
+  const [showScrollTop, setShowScrollTop] = useState(false);
+  const [showHeader, setShowHeader] = useState(true);
+  const lastScrollY = useRef(0);
+
+  const { scrollYProgress } = useScroll();
+  const scaleX = useSpring(scrollYProgress, {
+    stiffness: 100,
+    damping: 30,
+    restDelta: 0.001
+  });
 
   // Reader Settings State
   const [fontSize, setFontSize] = useState(18);
@@ -48,6 +62,10 @@ export default function ReaderPage({ params }: { params: Promise<{ slug: string;
         const text = await fetchChapterContent(slug, chapter.path);
         setContent(text);
         
+        // Calculate reading time (avg 200 words per minute)
+        const words = text.split(/\s+/).length;
+        setReadingTime(Math.ceil(words / 200));
+
         // Save to history and resume
         const novelTitle = slug.replace(/-/g, ' ').toUpperCase();
         await saveToHistory({
@@ -74,6 +92,41 @@ export default function ReaderPage({ params }: { params: Promise<{ slug: string;
     loadData();
   }, [slug, id]);
 
+  const nextChapter = config?.chapters.find(c => c.id === id + 1);
+  const prevChapter = config?.chapters.find(c => c.id === id - 1);
+
+  useEffect(() => {
+    const handleScroll = () => {
+      const currentScrollY = window.scrollY;
+      
+      // Show/hide scroll to top button
+      setShowScrollTop(currentScrollY > 500);
+
+      // Show/hide header on scroll
+      if (currentScrollY > lastScrollY.current && currentScrollY > 100) {
+        setShowHeader(false);
+      } else {
+        setShowHeader(true);
+      }
+      lastScrollY.current = currentScrollY;
+    };
+
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'ArrowLeft' && prevChapter) {
+        router.push(`/novel/${slug}/${prevChapter.id}`);
+      } else if (e.key === 'ArrowRight' && nextChapter) {
+        router.push(`/novel/${slug}/${nextChapter.id}`);
+      }
+    };
+
+    window.addEventListener('scroll', handleScroll);
+    window.addEventListener('keydown', handleKeyDown);
+    return () => {
+      window.removeEventListener('scroll', handleScroll);
+      window.removeEventListener('keydown', handleKeyDown);
+    };
+  }, [slug, prevChapter, nextChapter, router]);
+
   const handleSetFontSize = (size: number) => {
     setFontSize(size);
     localStorage.setItem('reader-font-size', size.toString());
@@ -83,9 +136,6 @@ export default function ReaderPage({ params }: { params: Promise<{ slug: string;
     setFontFamily(family);
     localStorage.setItem('reader-font-family', family);
   };
-
-  const nextChapter = config?.chapters.find(c => c.id === id + 1);
-  const prevChapter = config?.chapters.find(c => c.id === id - 1);
 
   if (loading) {
     return (
@@ -110,18 +160,27 @@ export default function ReaderPage({ params }: { params: Promise<{ slug: string;
 
   return (
     <div className="max-w-3xl mx-auto space-y-8 pb-20">
-      {/* Reader Header */}
-      <header className="space-y-6 text-center border-b border-white/10 pb-10">
-        <div className="flex items-center justify-between mb-6">
+      {/* Immersive Header */}
+      <motion.header 
+        className="fixed top-0 left-0 right-0 z-50 bg-[#050505]/80 backdrop-blur-xl border-b border-white/10 h-16"
+      >
+        <div className="max-w-3xl mx-auto h-full px-6 flex items-center justify-between">
           <div className="flex items-center gap-2">
-            <Link href={`/novel/${slug}`} className="p-2.5 rounded-full bg-[#1c1c1e] hover:bg-[#2c2c2e] transition-colors border border-white/5">
-              <Menu className="w-5 h-5" />
+            <Link href={`/novel/${slug}`} className="p-2 rounded-xl hover:bg-white/5 transition-colors" title="Bölüm Listesi">
+              <List className="w-5 h-5 text-[#8E8E93]" />
             </Link>
-            <Link href="/" className="p-2.5 rounded-full bg-[#1c1c1e] hover:bg-[#2c2c2e] transition-colors border border-white/5">
-              <Home className="w-5 h-5" />
+            <Link href="/" className="p-2 rounded-xl hover:bg-white/5 transition-colors" title="Ana Sayfa">
+              <Home className="w-5 h-5 text-[#8E8E93]" />
             </Link>
           </div>
-          
+
+          <div className="flex-1 text-center px-4 truncate">
+            <p className="text-[10px] font-bold text-primary uppercase tracking-widest truncate">
+              {slug.replace(/-/g, ' ')}
+            </p>
+            <p className="text-xs font-bold truncate">Bölüm {id}</p>
+          </div>
+
           <ReaderSettings 
             fontSize={fontSize} 
             setFontSize={handleSetFontSize} 
@@ -129,19 +188,49 @@ export default function ReaderPage({ params }: { params: Promise<{ slug: string;
             setFontFamily={handleSetFontFamily} 
           />
         </div>
-        <h1 className="text-xs font-bold text-primary tracking-[0.2em] uppercase opacity-80">
-          {slug.replace(/-/g, ' ')}
-        </h1>
-        <h2 className="text-3xl md:text-4xl font-bold tracking-tight">Bölüm {id}</h2>
-      </header>
+
+        {/* Reading Progress Bar (Integrated at the bottom of header) */}
+        <div className="absolute bottom-0 left-0 right-0 h-[2px] bg-white/5 pointer-events-none">
+          <motion.div
+            className="h-full bg-white shadow-[0_0_8px_rgba(255,255,255,0.8)]"
+            style={{ 
+              scaleX,
+              transformOrigin: "0%"
+            }}
+          />
+        </div>
+      </motion.header>
+
+      {/* Spacer for fixed header */}
+      <div className="h-16" />
+
+      {/* Reader Title Section */}
+      <div className="text-center space-y-4 pt-10 pb-6 border-b border-white/10">
+        <h1 className="text-4xl md:text-5xl font-bold tracking-tight">Bölüm {id}</h1>
+        <div className="flex items-center justify-center gap-4 text-sm text-[#8E8E93]">
+          <div className="flex items-center gap-1.5">
+            <Clock className="w-4 h-4" />
+            <span>{readingTime} dk okuma</span>
+          </div>
+          <div className="w-1 h-1 rounded-full bg-white/20" />
+          <div className="flex items-center gap-1.5">
+            <List className="w-4 h-4" />
+            <span>{config.total_chapters} Bölüm</span>
+          </div>
+        </div>
+      </div>
 
       {/* Content */}
       <motion.article 
         initial={{ opacity: 0, y: 10 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.5 }}
-        className="markdown-body prose prose-invert max-w-none text-white/90"
-        style={{ fontSize: `${fontSize}px`, fontFamily: fontFamily }}
+        className="markdown-body prose prose-invert max-w-none text-white/90 leading-relaxed"
+        style={{ 
+          fontSize: `${fontSize}px`, 
+          fontFamily: fontFamily,
+          lineHeight: 1.8 
+        }}
       >
         <ReactMarkdown>{content}</ReactMarkdown>
       </motion.article>
@@ -175,8 +264,25 @@ export default function ReaderPage({ params }: { params: Promise<{ slug: string;
         ) : <div className="flex-1" />}
       </div>
 
+      {/* Floating Buttons */}
+      <AnimatePresence>
+        {showScrollTop && (
+          <motion.button
+            initial={{ opacity: 0, scale: 0.8, y: 20 }}
+            animate={{ opacity: 1, scale: 1, y: 0 }}
+            exit={{ opacity: 0, scale: 0.8, y: 20 }}
+            onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
+            className="fixed bottom-24 right-6 md:bottom-10 md:right-10 p-4 rounded-full bg-primary text-white shadow-2xl shadow-primary/20 z-50 hover:scale-110 active:scale-95 transition-all"
+          >
+            <ArrowUp className="w-6 h-6" />
+          </motion.button>
+        )}
+      </AnimatePresence>
+
       {/* Comments */}
-      <GiscusComments />
+      <div className="pt-10">
+        <GiscusComments />
+      </div>
     </div>
   );
 }

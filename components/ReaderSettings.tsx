@@ -16,6 +16,7 @@ export function ReaderSettings({ fontSize, setFontSize, fontFamily, setFontFamil
 
   const fontFamilies = [
     { name: 'Sans', value: 'var(--font-sans)' },
+    { name: 'SF Pro', value: '-apple-system, BlinkMacSystemFont, "SF Pro Text", "SF Pro Display", "Helvetica Neue", Arial, sans-serif' },
     { name: 'Serif', value: 'Georgia, serif' },
     { name: 'Mono', value: 'ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace' },
   ];
