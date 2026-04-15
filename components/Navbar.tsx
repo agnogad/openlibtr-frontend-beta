@@ -47,28 +47,6 @@ export function Navbar() {
                 <span className="text-white">OpenLib<span className="text-primary">TR</span></span>
               </Link>
             </div>
-
-            {/* Right: Social Links */}
-            <div className="flex items-center gap-3 md:gap-5 ml-auto md:ml-0">
-              <a
-                href="https://discord.gg/vPjmyZtkpr"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="p-2 text-[#8E8E93] hover:text-white transition-colors"
-                title="Discord"
-              >
-                <MessageSquare className="w-5 h-5" />
-              </a>
-              <a
-                href="https://github.com/agnogad/openlibtr"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="p-2 text-[#8E8E93] hover:text-white transition-colors"
-                title="GitHub"
-              >
-                <Github className="w-5 h-5" />
-              </a>
-            </div>
           </div>
         </div>
       </nav>
