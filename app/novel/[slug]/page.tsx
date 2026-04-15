@@ -3,28 +3,46 @@
 import { useState, useEffect, use } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
-import { ChevronLeft, ChevronRight, List, Calendar, BookOpen } from 'lucide-react';
-import { NovelConfig, fetchNovelConfig, getCoverUrl } from '@/lib/api';
+import { ChevronLeft, ChevronRight, List, Calendar, BookOpen, Search, Play } from 'lucide-react';
+import { NovelConfig, fetchNovelConfig, getCoverUrl, getHistory, ReadingHistory } from '@/lib/api';
 import { motion } from 'motion/react';
+import { cn } from '@/lib/utils';
 
 export default function NovelDetailPage({ params }: { params: Promise<{ slug: string }> }) {
   const { slug } = use(params);
   const [config, setConfig] = useState<NovelConfig | null>(null);
   const [loading, setLoading] = useState(true);
+  const [searchQuery, setSearchQuery] = useState('');
+  const [lastReadChapterId, setLastReadChapterId] = useState<number | null>(null);
 
   useEffect(() => {
-    async function loadConfig() {
+    async function loadData() {
       try {
-        const data = await fetchNovelConfig(slug);
-        setConfig(data);
+        const [novelConfig, history] = await Promise.all([
+          fetchNovelConfig(slug),
+          getHistory()
+        ]);
+        
+        setConfig(novelConfig);
+        
+        // Find last read chapter for this novel
+        const novelHistory = history.find(item => item.slug === slug);
+        if (novelHistory) {
+          setLastReadChapterId(novelHistory.chapterId);
+        }
       } catch (error) {
-        console.error('Error loading novel config:', error);
+        console.error('Error loading novel data:', error);
       } finally {
         setLoading(false);
       }
     }
-    loadConfig();
+    loadData();
   }, [slug]);
+
+  const filteredChapters = config?.chapters.filter(chapter => 
+    chapter.id.toString().includes(searchQuery) || 
+    chapter.title.toLowerCase().includes(searchQuery.toLowerCase())
+  ) || [];
 
   if (loading) {
     return (
@@ -80,28 +98,83 @@ export default function NovelDetailPage({ params }: { params: Promise<{ slug: st
             </div>
           </div>
 
-          <div className="space-y-4">
-            <h2 className="text-xl font-bold flex items-center gap-2">
-              Bölüm Listesi
-            </h2>
-            <div className="grid gap-2">
-              {config.chapters.map((chapter) => (
-                <motion.div
-                  key={chapter.id}
-                  whileHover={{ x: 4 }}
-                  className="group"
-                >
-                  <Link
-                    href={`/novel/${slug}/${chapter.id}`}
-                    className="flex items-center justify-between p-4 rounded-xl bg-[#121212] border border-white/10 hover:bg-[#1c1c1e] transition-all"
+          {lastReadChapterId && (
+            <motion.div
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+            >
+              <Link
+                href={`/novel/${slug}/${lastReadChapterId}`}
+                className="inline-flex items-center gap-3 px-8 py-4 rounded-2xl bg-primary text-white font-bold shadow-lg shadow-primary/20 hover:scale-[1.02] active:scale-[0.98] transition-all"
+              >
+                <Play className="w-5 h-5 fill-current" />
+                <span>Kaldığın Yerden Devam Et (Bölüm {lastReadChapterId})</span>
+              </Link>
+            </motion.div>
+          )}
+
+          <div className="space-y-6">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+              <h2 className="text-xl font-bold flex items-center gap-2">
+                Bölüm Listesi
+              </h2>
+              
+              <div className="relative group max-w-xs w-full">
+                <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-[#8E8E93] group-focus-within:text-primary transition-colors" />
+                <input
+                  type="text"
+                  placeholder="Bölüm ara..."
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  className="w-full h-10 pl-10 pr-4 bg-[#1c1c1e] border border-white/10 rounded-xl focus:outline-none focus:ring-1 focus:ring-primary transition-all text-sm"
+                />
+              </div>
+            </div>
+
+            <div className="grid gap-2 max-h-[600px] overflow-y-auto pr-2 custom-scrollbar">
+              {filteredChapters.map((chapter) => {
+                const isRead = lastReadChapterId !== null && chapter.id <= lastReadChapterId;
+                return (
+                  <motion.div
+                    key={chapter.id}
+                    whileHover={{ x: 4 }}
+                    className="group"
                   >
-                    <span className="font-medium group-hover:text-primary transition-colors">
-                      Bölüm {chapter.id}
-                    </span>
-                    <ChevronRight className="w-4 h-4 text-[#8E8E93] group-hover:text-primary transition-colors" />
-                  </Link>
-                </motion.div>
-              ))}
+                    <Link
+                      href={`/novel/${slug}/${chapter.id}`}
+                      className={cn(
+                        "flex items-center justify-between p-4 rounded-xl border transition-all",
+                        isRead 
+                          ? "bg-primary/5 border-primary/20 hover:bg-primary/10" 
+                          : "bg-[#121212] border-white/10 hover:bg-[#1c1c1e]"
+                      )}
+                    >
+                      <div className="flex items-center gap-3">
+                        <span className={cn(
+                          "font-medium transition-colors",
+                          isRead ? "text-primary" : "group-hover:text-primary"
+                        )}>
+                          Bölüm {chapter.id}
+                        </span>
+                        {isRead && (
+                          <span className="text-[10px] font-bold uppercase tracking-wider text-primary/60 bg-primary/5 px-2 py-0.5 rounded border border-primary/10">
+                            Okundu
+                          </span>
+                        )}
+                      </div>
+                      <ChevronRight className={cn(
+                        "w-4 h-4 transition-colors",
+                        isRead ? "text-primary/60" : "text-[#8E8E93] group-hover:text-primary"
+                      )} />
+                    </Link>
+                  </motion.div>
+                );
+              })}
+              {filteredChapters.length === 0 && (
+                <div className="text-center py-10 text-[#8E8E93]">
+                  Aradığınız bölüm bulunamadı.
+                </div>
+              )}
             </div>
           </div>
         </div>

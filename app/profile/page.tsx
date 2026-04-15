@@ -2,16 +2,33 @@
 
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
-import { User, Settings, LogOut, BookOpen, Heart, Bell, ChevronRight, LogIn, UserPlus } from 'lucide-react';
+import { User, Settings, LogOut, BookOpen, Heart, Bell, ChevronRight, LogIn, UserPlus, Globe } from 'lucide-react';
 import { motion } from 'motion/react';
 import { supabase } from '@/lib/supabase';
 import type { User as SupabaseUser } from '@supabase/supabase-js';
 import { PromoBanners } from '@/components/PromoBanners';
 import { cn } from '@/lib/utils';
+import { ProxyProvider, ProxyConfig } from '@/lib/api';
 
 export default function ProfilePage() {
   const [user, setUser] = useState<SupabaseUser | null>(null);
   const [loading, setLoading] = useState(true);
+
+  const [proxyConfig, setProxyConfig] = useState<ProxyConfig>(() => {
+    if (typeof window !== 'undefined') {
+      const saved = localStorage.getItem('openlibtr_proxy_config');
+      return saved ? JSON.parse(saved) : { enabled: false, provider: 'gh-proxy.com' };
+    }
+    return { enabled: false, provider: 'gh-proxy.com' };
+  });
+
+  const updateProxyConfig = (updates: Partial<ProxyConfig>) => {
+    const newConfig = { ...proxyConfig, ...updates };
+    setProxyConfig(newConfig);
+    localStorage.setItem('openlibtr_proxy_config', JSON.stringify(newConfig));
+  };
+
+  const proxyProviders: ProxyProvider[] = ['fastgit.cc', 'gh.llkk.cc', 'gh-proxy.com', 'ghproxy.net'];
 
   useEffect(() => {
     const getSession = async () => {
@@ -196,6 +213,60 @@ export default function ProfilePage() {
                 </button>
               ))}
             </div>
+          </motion.div>
+
+          {/* Proxy Settings */}
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.35 }}
+            className="p-6 rounded-3xl bg-[#121212] border border-white/10 space-y-6"
+          >
+            <div className="flex items-center justify-between">
+              <h3 className="font-bold flex items-center gap-2">
+                <Globe className="w-5 h-5 text-primary" />
+                Proxy Ayarları
+              </h3>
+              <button
+                onClick={() => updateProxyConfig({ enabled: !proxyConfig.enabled })}
+                className={cn(
+                  "relative inline-flex h-6 w-11 items-center rounded-full transition-colors focus:outline-none",
+                  proxyConfig.enabled ? "bg-primary" : "bg-white/10"
+                )}
+              >
+                <span
+                  className={cn(
+                    "inline-block h-4 w-4 transform rounded-full bg-white transition-transform",
+                    proxyConfig.enabled ? "translate-x-6" : "translate-x-1"
+                  )}
+                />
+              </button>
+            </div>
+
+            {proxyConfig.enabled && (
+              <div className="space-y-3 animate-in fade-in slide-in-from-top-2 duration-300">
+                <p className="text-xs font-bold uppercase tracking-wider text-[#8E8E93]">Proxy Sağlayıcı Seçin</p>
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                  {proxyProviders.map((provider) => (
+                    <button
+                      key={provider}
+                      onClick={() => updateProxyConfig({ provider })}
+                      className={cn(
+                        "px-4 py-3 rounded-xl text-sm font-medium transition-all text-left border",
+                        proxyConfig.provider === provider
+                          ? "bg-primary/10 border-primary text-primary"
+                          : "bg-white/5 border-transparent text-[#8E8E93] hover:text-white hover:bg-white/10"
+                      )}
+                    >
+                      {provider}
+                    </button>
+                  ))}
+                </div>
+                <p className="text-[10px] text-[#8E8E93] leading-relaxed">
+                  Not: Proxy ayarları GitHub üzerinden çekilen kütüphane, kapak resimleri ve bölüm içerikleri için geçerlidir.
+                </p>
+              </div>
+            )}
           </motion.div>
 
           <PromoBanners />

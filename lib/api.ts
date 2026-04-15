@@ -32,28 +32,63 @@ export interface ResumeData {
   chapterId: number;
 }
 
+export type ProxyProvider = 'fastgit.cc' | 'gh.llkk.cc' | 'gh-proxy.com' | 'ghproxy.net' | 'none';
+
+const PROXY_CONFIG_KEY = 'openlibtr_proxy_config';
+
+export interface ProxyConfig {
+  enabled: boolean;
+  provider: ProxyProvider;
+}
+
 const BASE_URL = 'https://raw.githubusercontent.com/agnogad/openlibtr/main';
 
+function getProxiedUrl(url: string): string {
+  if (typeof window === 'undefined') return url;
+  
+  const configRaw = localStorage.getItem(PROXY_CONFIG_KEY);
+  if (!configRaw) return url;
+  
+  const config: ProxyConfig = JSON.parse(configRaw);
+  if (!config.enabled || config.provider === 'none') return url;
+
+  switch (config.provider) {
+    case 'fastgit.cc':
+      return `https://fastgit.cc/${url}`;
+    case 'gh.llkk.cc':
+      return `https://gh.llkk.cc/${url}`;
+    case 'gh-proxy.com':
+      return `https://gh-proxy.com/${url}`;
+    case 'ghproxy.net':
+      return `https://ghproxy.net/${url}`;
+    default:
+      return url;
+  }
+}
+
 export async function fetchLibrary(): Promise<Novel[]> {
-  const response = await fetch(`${BASE_URL}/library.json`);
+  const url = getProxiedUrl(`${BASE_URL}/library.json`);
+  const response = await fetch(url);
   if (!response.ok) throw new Error('Failed to fetch library');
   return response.json();
 }
 
 export async function fetchNovelConfig(slug: string): Promise<NovelConfig> {
-  const response = await fetch(`${BASE_URL}/books/${slug}/config.json`);
+  const url = getProxiedUrl(`${BASE_URL}/books/${slug}/config.json`);
+  const response = await fetch(url);
   if (!response.ok) throw new Error('Failed to fetch novel config');
   return response.json();
 }
 
 export async function fetchChapterContent(slug: string, path: string): Promise<string> {
-  const response = await fetch(`${BASE_URL}/books/${slug}/${path}`);
+  const url = getProxiedUrl(`${BASE_URL}/books/${slug}/${path}`);
+  const response = await fetch(url);
   if (!response.ok) throw new Error('Failed to fetch chapter content');
   return response.text();
 }
 
 export function getCoverUrl(slug: string): string {
-  return `${BASE_URL}/books/${slug}/cover.jpg`;
+  return getProxiedUrl(`${BASE_URL}/books/${slug}/cover.jpg`);
 }
 
 // LocalStorage Helpers
