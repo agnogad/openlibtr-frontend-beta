@@ -181,9 +181,12 @@ export function Navbar({ onNavigate, currentView, searchQuery, setSearchQuery }:
                       onNavigate?.('LIBRARY');
                     }
                   }}
-                  className="p-2.5 rounded-xl bg-white/5 border border-white/5"
+                  className={cn(
+                    "p-2.5 rounded-xl transition-all",
+                    isSearchOpen ? "bg-primary text-white" : "bg-white/5 border border-white/5 text-[#8E8E93]"
+                  )}
                 >
-                  <Search className="w-5 h-5 text-[#8E8E93]" />
+                  <Search className="w-5 h-5" />
                 </button>
                 {!user && (
                   <button 
@@ -195,31 +198,31 @@ export function Navbar({ onNavigate, currentView, searchQuery, setSearchQuery }:
                 )}
               </div>
             </div>
-            
-            {/* Mobile Search Input */}
-            <AnimatePresence>
-              {isSearchOpen && (
-                <motion.div 
-                  initial={{ height: 0, opacity: 0 }}
-                  animate={{ height: "auto", opacity: 1 }}
-                  exit={{ height: 0, opacity: 0 }}
-                  className="md:hidden w-full pb-4"
-                >
-                  <div className="relative">
-                    <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-[#8E8E93]" />
-                    <input
-                      type="text"
-                      placeholder="Binlerce bölüm arasında ara..."
-                      value={searchQuery}
-                      onChange={(e) => setSearchQuery(e.target.value)}
-                      autoFocus
-                      className="w-full h-12 pl-12 pr-4 bg-white/5 border border-white/10 rounded-2xl focus:outline-none text-sm font-bold"
-                    />
-                  </div>
-                </motion.div>
-              )}
-            </AnimatePresence>
           </div>
+
+          {/* Mobile Search Input - Moved outside h-20 to allow expansion */}
+          <AnimatePresence>
+            {isSearchOpen && (
+              <motion.div 
+                initial={{ height: 0, opacity: 0, y: -10 }}
+                animate={{ height: "auto", opacity: 1, y: 0 }}
+                exit={{ height: 0, opacity: 0, y: -10 }}
+                className="md:hidden w-full pb-6"
+              >
+                <div className="relative">
+                  <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-primary" />
+                  <input
+                    type="text"
+                    placeholder="Binlerce bölüm arasında ara..."
+                    value={searchQuery}
+                    onChange={(e) => setSearchQuery(e.target.value)}
+                    autoFocus
+                    className="w-full h-14 pl-12 pr-4 bg-white/5 border border-primary/20 rounded-2xl focus:outline-none focus:border-primary/50 text-sm font-bold shadow-2xl shadow-primary/5"
+                  />
+                </div>
+              </motion.div>
+            )}
+          </AnimatePresence>
         </div>
       </nav>
 
