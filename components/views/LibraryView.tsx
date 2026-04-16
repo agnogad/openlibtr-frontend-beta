@@ -44,21 +44,21 @@ export function LibraryView({ onNavigate, novels, history, searchQuery }: Librar
     <div className="space-y-12 pb-20">
       {/* Hero Slider Section */}
       {!searchQuery && featuredNovels.length > 0 && (
-        <section className="relative h-[500px] md:h-[650px] -mx-6 md:mx-0">
+        <section className="relative h-[380px] md:h-[480px] -mx-6 md:mx-0">
           <AnimatePresence mode="wait">
             <motion.div
               key={currentSlide}
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              exit={{ opacity: 0 }}
-              transition={{ duration: 1 }}
-              className="absolute inset-0 rounded-none md:rounded-[3.5rem] overflow-hidden"
+              initial={{ opacity: 0, scale: 0.98 }}
+              animate={{ opacity: 1, scale: 1 }}
+              exit={{ opacity: 0, scale: 1.02 }}
+              transition={{ duration: 0.8, ease: [0.4, 0, 0.2, 1] }}
+              className="absolute inset-0 rounded-none md:rounded-[2.5rem] overflow-hidden border border-white/5 shadow-2xl"
             >
-              {/* Background Image with Zoom */}
+              {/* Background Image with Parallax-like Zoom */}
               <motion.div 
-                initial={{ scale: 1.1 }}
-                animate={{ scale: 1 }}
-                transition={{ duration: 10, ease: "linear" }}
+                initial={{ scale: 1.15 }}
+                animate={{ scale: 1.05 }}
+                transition={{ duration: 8, ease: "linear" }}
                 className="absolute inset-0"
               >
                 <Image 
@@ -71,49 +71,48 @@ export function LibraryView({ onNavigate, novels, history, searchQuery }: Librar
                 />
               </motion.div>
 
-              {/* Overlays */}
-              <div className="absolute inset-0 bg-gradient-to-t from-[#050505] via-[#050505]/20 to-transparent" />
-              <div className="absolute inset-0 bg-black/20" />
+              {/* Refined Overlays */}
+              <div className="absolute inset-0 bg-gradient-to-t from-[#050505] via-[#050505]/40 to-transparent" />
+              <div className="absolute inset-0 bg-black/10 backdrop-blur-[2px]" />
               
-              {/* Content */}
-              <div className="absolute inset-0 flex flex-col justify-end p-8 md:p-20">
-                <div className="max-w-4xl space-y-8">
+              {/* Content - More Compact & Modern */}
+              <div className="absolute inset-0 flex flex-col justify-end p-8 md:p-14">
+                <div className="max-w-3xl space-y-6">
                   <motion.div 
-                    initial={{ opacity: 0, y: 20 }}
+                    initial={{ opacity: 0, y: 15 }}
                     animate={{ opacity: 1, y: 0 }}
-                    transition={{ delay: 0.3 }}
-                    className="space-y-4"
+                    transition={{ delay: 0.2 }}
+                    className="space-y-3"
                   >
-                    <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-primary/20 border border-primary/30 backdrop-blur-md">
+                    <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/10 border border-white/10 backdrop-blur-xl">
                       <Sparkles className="w-3 h-3 text-primary" />
-                      <span className="text-[9px] font-black uppercase tracking-[0.3em] text-primary">Haftanın Favorisi</span>
+                      <span className="text-[8px] font-black uppercase tracking-[0.25em] text-white/90">Editörün Seçimi</span>
                     </div>
                     
-                    <h1 className="text-4xl md:text-5xl font-black tracking-tight uppercase leading-[0.9] drop-shadow-2xl">
+                    <h1 className="text-3xl md:text-5xl font-black tracking-tight uppercase leading-[0.95] drop-shadow-xl">
                       {featuredNovels[currentSlide].title}
                     </h1>
                   </motion.div>
                   
                   <motion.div 
-                    initial={{ opacity: 0, y: 20 }}
+                    initial={{ opacity: 0, y: 15 }}
                     animate={{ opacity: 1, y: 0 }}
-                    transition={{ delay: 0.4 }}
-                    className="flex flex-wrap items-center gap-6"
+                    transition={{ delay: 0.3 }}
+                    className="flex flex-wrap items-center gap-4"
                   >
                     <button 
                       onClick={() => onNavigate('NOVEL_DETAIL', { slug: featuredNovels[currentSlide].slug })}
-                      className="group relative px-12 py-5 rounded-2xl bg-white text-black font-black uppercase tracking-widest text-[11px] overflow-hidden transition-all hover:scale-105 active:scale-95"
+                      className="group relative px-8 py-4 rounded-xl bg-primary text-white font-black uppercase tracking-widest text-[10px] overflow-hidden transition-all hover:shadow-[0_0_30px_rgba(255,100,0,0.3)] active:scale-95"
                     >
-                      <span className="relative z-10">Hemen Oku</span>
-                      <div className="absolute inset-0 bg-primary translate-y-full group-hover:translate-y-0 transition-transform duration-300" />
+                      <span className="relative z-10">Keşfet</span>
                     </button>
 
                     {resumeData && resumeData.slug === featuredNovels[currentSlide].slug && (
                       <button 
                         onClick={() => onNavigate('READER', { slug: resumeData.slug, chapterId: resumeData.chapterId })}
-                        className="px-10 py-5 rounded-2xl bg-white/10 backdrop-blur-xl border border-white/20 text-white font-black uppercase tracking-widest text-[11px] hover:bg-white/20 transition-all"
+                        className="px-8 py-4 rounded-xl bg-white/5 backdrop-blur-xl border border-white/10 text-white font-black uppercase tracking-widest text-[10px] hover:bg-white/10 transition-all"
                       >
-                        Devam Et: Bölüm {resumeData.chapterId}
+                        Bölüm {resumeData.chapterId}&apos;den Devam Et
                       </button>
                     )}
                   </motion.div>
@@ -122,35 +121,35 @@ export function LibraryView({ onNavigate, novels, history, searchQuery }: Librar
             </motion.div>
           </AnimatePresence>
 
-          {/* Slider Controls - Minimalist Glass */}
-          <div className="absolute bottom-10 right-10 md:right-20 flex items-center gap-8 z-10">
-            <div className="flex gap-3">
+          {/* Minimalist Controls */}
+          <div className="absolute bottom-8 right-8 md:right-12 flex items-center gap-6 z-10">
+            <div className="flex gap-2">
               {featuredNovels.map((_, i) => (
                 <button
                   key={i}
                   onClick={() => setCurrentSlide(i)}
-                  className="group relative py-4"
+                  className="group py-2"
                 >
                   <div className={cn(
                     "h-1 rounded-full transition-all duration-500",
-                    currentSlide === i ? "w-12 bg-primary" : "w-6 bg-white/20 group-hover:bg-white/40"
+                    currentSlide === i ? "w-10 bg-primary" : "w-4 bg-white/20 group-hover:bg-white/40"
                   )} />
                 </button>
               ))}
             </div>
             
-            <div className="flex items-center gap-3">
+            <div className="flex items-center gap-2">
               <button 
                 onClick={prevSlide}
-                className="w-14 h-14 rounded-2xl bg-white/5 backdrop-blur-xl border border-white/10 flex items-center justify-center hover:bg-white/10 transition-all text-white"
+                className="w-10 h-10 rounded-xl bg-white/5 backdrop-blur-xl border border-white/10 flex items-center justify-center hover:bg-white/10 transition-all text-white"
               >
-                <ChevronLeft className="w-6 h-6" />
+                <ChevronLeft className="w-5 h-5" />
               </button>
               <button 
                 onClick={nextSlide}
-                className="w-14 h-14 rounded-2xl bg-white/5 backdrop-blur-xl border border-white/10 flex items-center justify-center hover:bg-white/10 transition-all text-white"
+                className="w-10 h-10 rounded-xl bg-white/5 backdrop-blur-xl border border-white/10 flex items-center justify-center hover:bg-white/10 transition-all text-white"
               >
-                <ChevronRight className="w-6 h-6" />
+                <ChevronRight className="w-5 h-5" />
               </button>
             </div>
           </div>
