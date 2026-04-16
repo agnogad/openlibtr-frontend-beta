@@ -11,8 +11,8 @@ import { supabase } from '@/lib/supabase';
 interface NavbarProps {
   onNavigate?: (view: string, params?: any) => void;
   currentView?: string;
-  searchQuery: string;
-  setSearchQuery: (query: string) => void;
+  searchQuery?: string;
+  setSearchQuery?: (query: string) => void;
 }
 
 const Logo = ({ onNavigate }: { onNavigate?: (view: string, params?: any) => void }) => (
@@ -135,9 +135,9 @@ export function Navbar({ onNavigate, currentView, searchQuery, setSearchQuery }:
                         exit={{ width: 0, opacity: 0 }}
                         type="text"
                         placeholder="Ara..."
-                        value={searchQuery}
+                        value={searchQuery || ''}
                         onChange={(e) => {
-                          setSearchQuery(e.target.value);
+                          setSearchQuery?.(e.target.value);
                           if (currentView !== 'LIBRARY') {
                             onNavigate?.('LIBRARY');
                           }
@@ -214,8 +214,8 @@ export function Navbar({ onNavigate, currentView, searchQuery, setSearchQuery }:
                   <input
                     type="text"
                     placeholder="Binlerce bölüm arasında ara..."
-                    value={searchQuery}
-                    onChange={(e) => setSearchQuery(e.target.value)}
+                    value={searchQuery || ''}
+                    onChange={(e) => setSearchQuery?.(e.target.value)}
                     autoFocus
                     className="w-full h-14 pl-12 pr-4 bg-white/5 border border-primary/20 rounded-2xl focus:outline-none focus:border-primary/50 text-sm font-bold shadow-2xl shadow-primary/5"
                   />
