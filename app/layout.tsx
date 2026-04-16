@@ -6,6 +6,9 @@ import { ClientLayout } from '@/components/ClientLayout';
 export const metadata: Metadata = {
   title: 'OpenLibTR - Light Novel Reader',
   description: 'Modern ve karanlık mod odaklı Light Novel okuma platformu.',
+  icons: {
+    icon: '/icon.svg',
+  },
 };
 
 export default function RootLayout({children}: {children: React.ReactNode}) {
