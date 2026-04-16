@@ -40,6 +40,7 @@ export default function MainApp() {
   const [novels, setNovels] = useState<Novel[]>([]);
   const [history, setHistory] = useState<ReadingHistory[]>([]);
   const [isDataLoaded, setIsDataLoaded] = useState(false);
+  const [searchQuery, setSearchQuery] = useState('');
 
   useEffect(() => {
     let isMounted = true;
@@ -111,7 +112,7 @@ export default function MainApp() {
 
     switch (view.type) {
       case 'LIBRARY':
-        return <LibraryView onNavigate={handleNavigate} novels={novels} history={history} />;
+        return <LibraryView onNavigate={handleNavigate} novels={novels} history={history} searchQuery={searchQuery} />;
       case 'NOVEL_DETAIL':
         return <NovelDetailView slug={view.params.slug} onNavigate={handleNavigate} history={history} />;
       case 'READER':
@@ -125,7 +126,7 @@ export default function MainApp() {
       case 'SIGNUP':
         return <SignupView onNavigate={handleNavigate} />;
       default:
-        return <LibraryView onNavigate={handleNavigate} novels={novels} history={history} />;
+        return <LibraryView onNavigate={handleNavigate} novels={novels} history={history} searchQuery={searchQuery} />;
     }
   };
 
@@ -133,7 +134,14 @@ export default function MainApp() {
 
   return (
     <div className="min-h-screen">
-      {!isReaderView && <Navbar onNavigate={handleNavigate} currentView={view.type} />}
+      {!isReaderView && (
+        <Navbar 
+          onNavigate={handleNavigate} 
+          currentView={view.type} 
+          searchQuery={searchQuery}
+          setSearchQuery={setSearchQuery}
+        />
+      )}
       <main className={cn(
         "mx-auto px-6 py-8 transition-all duration-500",
         isReaderView ? "max-w-3xl -mt-24" : "max-w-5xl md:px-10"

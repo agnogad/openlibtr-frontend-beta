@@ -13,10 +13,10 @@ interface LibraryViewProps {
   onNavigate: (view: string, params?: any) => void;
   novels: Novel[];
   history: ReadingHistory[];
+  searchQuery: string;
 }
 
-export function LibraryView({ onNavigate, novels, history }: LibraryViewProps) {
-  const [searchQuery, setSearchQuery] = useState('');
+export function LibraryView({ onNavigate, novels, history, searchQuery }: LibraryViewProps) {
   const [currentSlide, setCurrentSlide] = useState(0);
   
   const featuredNovels = useMemo(() => novels.slice(0, 5), [novels]);
@@ -89,7 +89,7 @@ export function LibraryView({ onNavigate, novels, history }: LibraryViewProps) {
                       <span className="text-[9px] font-black uppercase tracking-[0.3em] text-primary">Haftanın Favorisi</span>
                     </div>
                     
-                    <h1 className="text-5xl md:text-8xl font-black tracking-tight uppercase leading-[0.9] drop-shadow-2xl">
+                    <h1 className="text-4xl md:text-5xl font-black tracking-tight uppercase leading-[0.9] drop-shadow-2xl">
                       {featuredNovels[currentSlide].title}
                     </h1>
                   </motion.div>
@@ -170,21 +170,6 @@ export function LibraryView({ onNavigate, novels, history }: LibraryViewProps) {
         </section>
       )}
 
-      {/* Search Bar */}
-      <header className="sticky top-20 z-40 py-4 bg-[#050505]/80 backdrop-blur-xl -mx-6 px-6">
-        <div className="max-w-5xl mx-auto flex flex-col md:flex-row gap-6 items-center justify-between">
-          <div className="relative group flex-1 w-full">
-            <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-[#8E8E93] group-focus-within:text-primary transition-colors" />
-            <input
-              type="text"
-              placeholder="Binlerce bölüm arasında ara..."
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full h-14 pl-12 pr-4 bg-[#121212] border border-white/5 rounded-2xl focus:outline-none focus:ring-2 focus:ring-primary/50 transition-all text-base font-medium placeholder:text-[#444]"
-            />
-          </div>
-        </div>
-      </header>
 
       {/* Novels Grid */}
       <section className="space-y-8">

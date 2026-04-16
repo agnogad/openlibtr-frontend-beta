@@ -5,12 +5,14 @@ import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { Home, History, User, Search, Library, LogIn } from 'lucide-react';
 import { cn } from '@/lib/utils';
-import { motion } from 'motion/react';
+import { motion, AnimatePresence } from 'motion/react';
 import { supabase } from '@/lib/supabase';
 
 interface NavbarProps {
   onNavigate?: (view: string, params?: any) => void;
   currentView?: string;
+  searchQuery: string;
+  setSearchQuery: (query: string) => void;
 }
 
 const Logo = ({ onNavigate }: { onNavigate?: (view: string, params?: any) => void }) => (
@@ -33,9 +35,10 @@ const Logo = ({ onNavigate }: { onNavigate?: (view: string, params?: any) => voi
   </Link>
 );
 
-export function Navbar({ onNavigate, currentView }: NavbarProps) {
+export function Navbar({ onNavigate, currentView, searchQuery, setSearchQuery }: NavbarProps) {
   const pathname = usePathname();
   const [user, setUser] = useState<any>(null);
+  const [isSearchOpen, setIsSearchOpen] = useState(false);
 
   useEffect(() => {
     supabase.auth.getSession().then(({ data: { session } }) => {
@@ -120,9 +123,40 @@ export function Navbar({ onNavigate, currentView }: NavbarProps) {
 
               {/* Right Side */}
               <div className="flex-1 flex items-center justify-end gap-4">
-                <button className="p-2.5 rounded-xl bg-white/5 border border-white/5 hover:bg-white/10 transition-all">
-                  <Search className="w-5 h-5 text-[#8E8E93]" />
-                </button>
+                <div className={cn(
+                  "relative flex items-center transition-all duration-300",
+                  isSearchOpen ? "w-full md:w-64" : "w-10"
+                )}>
+                  <AnimatePresence>
+                    {isSearchOpen && (
+                      <motion.input
+                        initial={{ width: 0, opacity: 0 }}
+                        animate={{ width: "100%", opacity: 1 }}
+                        exit={{ width: 0, opacity: 0 }}
+                        type="text"
+                        placeholder="Ara..."
+                        value={searchQuery}
+                        onChange={(e) => {
+                          setSearchQuery(e.target.value);
+                          if (currentView !== 'LIBRARY') {
+                            onNavigate?.('LIBRARY');
+                          }
+                        }}
+                        autoFocus
+                        className="w-full h-10 pl-10 pr-4 bg-white/5 border border-white/10 rounded-xl focus:outline-none focus:ring-1 focus:ring-primary/50 text-xs font-bold"
+                      />
+                    )}
+                  </AnimatePresence>
+                  <button 
+                    onClick={() => setIsSearchOpen(!isSearchOpen)}
+                    className={cn(
+                      "p-2.5 rounded-xl bg-white/5 border border-white/5 hover:bg-white/10 transition-all",
+                      isSearchOpen ? "absolute left-0 border-none bg-transparent" : ""
+                    )}
+                  >
+                    <Search className="w-5 h-5 text-[#8E8E93]" />
+                  </button>
+                </div>
                 
                 {!user && (
                   <button 
@@ -140,7 +174,15 @@ export function Navbar({ onNavigate, currentView }: NavbarProps) {
             <div className="md:hidden flex items-center justify-between w-full">
               <Logo onNavigate={onNavigate} />
               <div className="flex items-center gap-3">
-                <button className="p-2.5 rounded-xl bg-white/5 border border-white/5">
+                <button 
+                  onClick={() => {
+                    setIsSearchOpen(!isSearchOpen);
+                    if (!isSearchOpen && currentView !== 'LIBRARY') {
+                      onNavigate?.('LIBRARY');
+                    }
+                  }}
+                  className="p-2.5 rounded-xl bg-white/5 border border-white/5"
+                >
                   <Search className="w-5 h-5 text-[#8E8E93]" />
                 </button>
                 {!user && (
@@ -153,6 +195,30 @@ export function Navbar({ onNavigate, currentView }: NavbarProps) {
                 )}
               </div>
             </div>
+            
+            {/* Mobile Search Input */}
+            <AnimatePresence>
+              {isSearchOpen && (
+                <motion.div 
+                  initial={{ height: 0, opacity: 0 }}
+                  animate={{ height: "auto", opacity: 1 }}
+                  exit={{ height: 0, opacity: 0 }}
+                  className="md:hidden w-full pb-4"
+                >
+                  <div className="relative">
+                    <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-[#8E8E93]" />
+                    <input
+                      type="text"
+                      placeholder="Binlerce bölüm arasında ara..."
+                      value={searchQuery}
+                      onChange={(e) => setSearchQuery(e.target.value)}
+                      autoFocus
+                      className="w-full h-12 pl-12 pr-4 bg-white/5 border border-white/10 rounded-2xl focus:outline-none text-sm font-bold"
+                    />
+                  </div>
+                </motion.div>
+              )}
+            </AnimatePresence>
           </div>
         </div>
       </nav>
