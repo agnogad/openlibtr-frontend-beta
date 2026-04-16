@@ -11,6 +11,7 @@ import { LoginView } from '@/components/views/LoginView';
 import { SignupView } from '@/components/views/SignupView';
 import { motion, AnimatePresence } from 'motion/react';
 import { fetchLibrary, getHistory, Novel, ReadingHistory } from '@/lib/api';
+import { cn } from '@/lib/utils';
 
 type ViewType = 'LIBRARY' | 'NOVEL_DETAIL' | 'READER' | 'HISTORY' | 'PROFILE' | 'LOGIN' | 'SIGNUP';
 
@@ -151,9 +152,4 @@ export default function MainApp() {
       </main>
     </div>
   );
-}
-
-// Helper for cn in page.tsx
-function cn(...classes: (string | boolean | undefined)[]) {
-  return classes.filter(Boolean).join(' ');
 }
