@@ -17,9 +17,7 @@ interface LibraryViewProps {
 }
 
 export function LibraryView({ onNavigate, novels, history, searchQuery }: LibraryViewProps) {
-  const [currentSlide, setCurrentSlide] = useState(0);
-  
-  const featuredNovels = useMemo(() => novels.slice(0, 5), [novels]);
+  const featuredNovels = useMemo(() => novels.slice(0, 3), [novels]);
   
   const resumeData = useMemo(() => {
     return history.length > 0 ? history[0] : null;
@@ -29,149 +27,76 @@ export function LibraryView({ onNavigate, novels, history, searchQuery }: Librar
     novel.title.toLowerCase().includes(searchQuery.toLowerCase())
   );
 
-  useEffect(() => {
-    if (featuredNovels.length <= 1) return;
-    const timer = setInterval(() => {
-      setCurrentSlide((prev) => (prev + 1) % featuredNovels.length);
-    }, 6000);
-    return () => clearInterval(timer);
-  }, [featuredNovels.length]);
-
-  const nextSlide = () => setCurrentSlide((prev) => (prev + 1) % featuredNovels.length);
-  const prevSlide = () => setCurrentSlide((prev) => (prev - 1 + featuredNovels.length) % featuredNovels.length);
-
   return (
     <div className="space-y-12 pb-20">
-      {/* Hero Slider Section */}
-      {!searchQuery && featuredNovels.length > 0 && (
-        <section className="relative h-[480px] md:h-[600px] -mx-6 md:mx-0 group overflow-hidden md:rounded-[3rem] shadow-2xl">
-          <AnimatePresence mode="wait">
-            <motion.div
-              key={currentSlide}
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              exit={{ opacity: 0 }}
-              transition={{ duration: 1 }}
-              className="absolute inset-0"
-            >
-              {/* Immersive Background Image */}
-              <motion.div 
-                initial={{ scale: 1.15 }}
-                animate={{ scale: 1 }}
-                transition={{ duration: 8, ease: "easeOut" }}
-                className="absolute inset-0"
+      {/* Editorial Spotlight Grid */}
+      {!searchQuery && featuredNovels.length >= 3 && (
+        <section className="grid grid-cols-1 md:grid-cols-5 gap-4 md:gap-6 mt-16 md:mt-20">
+          {/* Main Hero Spotlight */}
+          <motion.div 
+            initial={{ opacity: 0, x: -20 }}
+            animate={{ opacity: 1, x: 0 }}
+            className="md:col-span-3 h-[240px] md:h-[450px] relative rounded-[2rem] md:rounded-[2.5rem] overflow-hidden group shadow-2xl"
+          >
+            <Image 
+              src={getCoverUrl(featuredNovels[0].slug)} 
+              alt={featuredNovels[0].title}
+              fill
+              className="object-cover transition-transform duration-1000 group-hover:scale-110"
+              referrerPolicy="no-referrer"
+              priority
+            />
+            <div className="absolute inset-0 bg-gradient-to-t from-black via-black/40 to-transparent" />
+            <div className="absolute inset-0 p-6 md:p-8 flex flex-col justify-end gap-3 md:gap-4">
+              <div className="space-y-1 md:space-y-2">
+                <div className="inline-flex items-center gap-2 px-2.5 py-0.5 md:px-3 md:py-1 rounded-full bg-white/5 border border-white/10 backdrop-blur-xl">
+                  <Sparkles className="w-2.5 h-2.5 text-[#8E8E93]" />
+                  <span className="text-[8px] md:text-[9px] font-black uppercase tracking-widest text-[#8E8E93]">Haftanın Favorisi</span>
+                </div>
+                <h1 className="text-2xl md:text-5xl font-display font-black tracking-tight uppercase leading-[0.9] line-clamp-1 md:line-clamp-2">
+                  {featuredNovels[0].title}
+                </h1>
+              </div>
+              <button 
+                onClick={() => onNavigate('NOVEL_DETAIL', { slug: featuredNovels[0].slug })}
+                className="w-fit px-6 py-2.5 md:px-8 md:py-3.5 rounded-xl md:rounded-2xl bg-primary text-white text-[9px] md:text-[10px] font-black uppercase tracking-widest hover:scale-105 active:scale-95 transition-all"
+              >
+                Hemen Oku
+              </button>
+            </div>
+          </motion.div>
+
+          {/* Secondary Spotlight Stack */}
+          <div className="md:col-span-2 grid grid-cols-2 md:grid-cols-1 md:grid-rows-2 gap-4 md:gap-6">
+            {[featuredNovels[1], featuredNovels[2]].map((novel, idx) => (
+              <motion.div
+                key={novel.slug}
+                initial={{ opacity: 0, x: 20 }}
+                animate={{ opacity: 1, x: 0 }}
+                transition={{ delay: 0.1 * (idx + 1) }}
+                className="relative h-[120px] md:h-auto rounded-2xl md:rounded-[2rem] overflow-hidden group shadow-xl border border-white/5"
               >
                 <Image 
-                  src={getCoverUrl(featuredNovels[currentSlide].slug)} 
-                  alt={featuredNovels[currentSlide].title} 
+                  src={getCoverUrl(novel.slug)} 
+                  alt={novel.title}
                   fill
-                  className="w-full h-full object-cover"
+                  className="object-cover transition-transform duration-700 group-hover:scale-110"
                   referrerPolicy="no-referrer"
-                  priority
                 />
-              </motion.div>
-
-              {/* Dynamic Overlay Layers */}
-              <div className="absolute inset-0 bg-gradient-to-t from-black via-black/60 to-transparent" />
-              <div className="absolute inset-0 bg-gradient-to-r from-black/90 via-transparent to-transparent hidden md:block" />
-              <div className="absolute inset-0 bg-black/20 backdrop-blur-[1px]" />
-              
-              {/* Content Container */}
-              <div className="absolute inset-0 flex flex-col justify-end p-8 md:p-20 pb-20 md:pb-24">
-                <div className="max-w-4xl space-y-6 md:space-y-8">
-                  <motion.div 
-                    initial={{ opacity: 0, y: 30 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ delay: 0.3, duration: 0.8 }}
-                    className="space-y-4"
+                <div className="absolute inset-0 bg-black/60 group-hover:bg-black/40 transition-colors" />
+                <div className="absolute inset-0 p-4 md:p-6 flex flex-col justify-end gap-2 md:gap-3">
+                  <h3 className="text-sm md:text-xl font-display font-black tracking-tight uppercase leading-none line-clamp-1">
+                    {novel.title}
+                  </h3>
+                  <button 
+                    onClick={() => onNavigate('NOVEL_DETAIL', { slug: novel.slug })}
+                    className="text-[8px] md:text-[9px] font-black uppercase tracking-[0.2em] text-primary hover:text-white transition-colors text-left"
                   >
-                    <div className="inline-flex items-center gap-3 px-4 py-1.5 rounded-full bg-white/5 border border-white/10 backdrop-blur-3xl shadow-xl">
-                      <Sparkles className="w-3 h-3 text-[#8E8E93]" />
-                      <span className="text-[10px] font-black uppercase tracking-[0.3em] text-[#8E8E93]">Öne Çıkan Seri</span>
-                    </div>
-                    
-                    <h1 className="text-4xl md:text-8xl font-display font-black tracking-tighter uppercase leading-[0.85] drop-shadow-[0_10px_30px_rgba(0,0,0,0.5)]">
-                      {featuredNovels[currentSlide].title}
-                    </h1>
-
-                    <div className="flex items-center gap-6 text-[11px] font-black uppercase tracking-[0.2em] text-white/50">
-                      <div className="flex items-center gap-2">
-                        <Library className="w-4 h-4 text-primary" />
-                        <span>{featuredNovels[currentSlide].chapterCount} Bölüm</span>
-                      </div>
-                      <div className="w-1 h-1 rounded-full bg-white/20" />
-                      <div>Popüler Seri</div>
-                    </div>
-                  </motion.div>
-                  
-                  <motion.div 
-                    initial={{ opacity: 0, y: 20 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ delay: 0.5, duration: 0.8 }}
-                    className="flex flex-wrap items-center gap-4 md:gap-6"
-                  >
-                    <button 
-                      onClick={() => onNavigate('NOVEL_DETAIL', { slug: featuredNovels[currentSlide].slug })}
-                      className="group relative px-10 py-5 rounded-2xl bg-primary text-white font-black uppercase tracking-widest text-[11px] transition-all hover:scale-105 hover:shadow-[0_20px_40px_rgba(255,100,0,0.3)] active:scale-95 overflow-hidden"
-                    >
-                      <div className="absolute inset-0 bg-white/20 translate-y-full group-hover:translate-y-0 transition-transform duration-500" />
-                      <span className="relative z-10 flex items-center gap-2">
-                        Hemen Oku <ChevronRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
-                      </span>
-                    </button>
-
-                    {resumeData && resumeData.slug === featuredNovels[currentSlide].slug && (
-                      <button 
-                        onClick={() => onNavigate('READER', { slug: resumeData.slug, chapterId: resumeData.chapterId })}
-                        className="px-10 py-5 rounded-2xl bg-white/5 backdrop-blur-2xl border border-white/10 text-white font-black uppercase tracking-widest text-[11px] hover:bg-white/10 transition-all border-b-primary/50"
-                      >
-                        Bölüm {resumeData.chapterId}&apos;den Devam Et
-                      </button>
-                    )}
-                  </motion.div>
+                    Detay →
+                  </button>
                 </div>
-              </div>
-            </motion.div>
-          </AnimatePresence>
-
-          {/* Slider Controls */}
-          <div className="absolute bottom-10 right-10 flex items-center gap-4 z-20">
-            <div className="flex items-center gap-1.5 bg-black/40 backdrop-blur-2xl p-2 rounded-2xl border border-white/5">
-              {featuredNovels.map((_, i) => (
-                <button
-                  key={i}
-                  onClick={() => setCurrentSlide(i)}
-                  className="p-1"
-                >
-                  <div className={cn(
-                    "h-1.5 rounded-full transition-all duration-700",
-                    currentSlide === i ? "w-10 bg-primary" : "w-2 bg-white/20 hover:bg-white/40"
-                  )} />
-                </button>
-              ))}
-            </div>
-            
-            <div className="flex items-center gap-2">
-              <button 
-                onClick={prevSlide}
-                className="w-14 h-14 rounded-2xl glass flex items-center justify-center hover:bg-primary hover:border-primary transition-all text-white group"
-              >
-                <ChevronLeft className="w-6 h-6 group-hover:-translate-x-1 transition-transform" />
-              </button>
-              <button 
-                onClick={nextSlide}
-                className="w-14 h-14 rounded-2xl glass flex items-center justify-center hover:bg-primary hover:border-primary transition-all text-white group"
-              >
-                <ChevronRight className="w-6 h-6 group-hover:translate-x-1 transition-transform" />
-              </button>
-            </div>
-          </div>
-
-          {/* Side Indicator Labels - Desktop Only */}
-          <div className="absolute left-10 top-1/2 -translate-y-1/2 hidden xl:flex flex-col gap-10 z-20">
-            <div className="rotate-90 origin-left text-[10px] font-black uppercase tracking-[0.5em] text-white/20 whitespace-nowrap">
-              OpenLibTR Premium Reader
-            </div>
+              </motion.div>
+            ))}
           </div>
         </section>
       )}

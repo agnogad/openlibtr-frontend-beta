@@ -145,7 +145,7 @@ export default function MainApp() {
       <main className={cn(
         "mx-auto px-6 transition-all duration-500",
         isReaderView ? "max-w-3xl py-8 -mt-20" : 
-        (view.type === 'LIBRARY' && !searchQuery) ? "max-w-5xl md:px-10 pt-2 pb-8" : "max-w-5xl md:px-10 py-8"
+        (view.type === 'LIBRARY' && !searchQuery) ? "max-w-5xl md:px-10 pt-0 pb-8" : "max-w-5xl md:px-10 py-8"
       )}>
         <AnimatePresence mode="wait">
           <motion.div
