@@ -117,10 +117,10 @@ export function NovelDetailView({ slug, onNavigate, history }: NovelDetailViewPr
             >
               <button
                 onClick={() => onNavigate('READER', { slug, chapterId: lastReadChapterId })}
-                className="flex items-center justify-center gap-3 w-full py-5 rounded-[2rem] bg-primary text-white font-black uppercase tracking-widest text-xs shadow-xl shadow-primary/20 hover:scale-[1.02] active:scale-[0.98] transition-all"
+                className="flex items-center justify-center gap-3 w-full py-5 rounded-[2rem] bg-primary text-white font-black uppercase tracking-widest text-[11px] shadow-xl shadow-primary/20 hover:scale-[1.02] active:scale-[0.98] transition-all group"
               >
-                <Play className="w-4 h-4 fill-current" />
-                <span>Kaldığın Yerden Devam Et</span>
+                <Play className="w-4 h-4 fill-current group-hover:scale-110 transition-transform" />
+                <span>Bölüm {lastReadChapterId}&apos;den Devam Et</span>
               </button>
             </motion.div>
           )}
@@ -133,8 +133,19 @@ export function NovelDetailView({ slug, onNavigate, history }: NovelDetailViewPr
               animate={{ opacity: 1, x: 0 }}
               className="space-y-4"
             >
-              <div className="flex items-center gap-3 text-primary font-black text-[9px] uppercase tracking-[0.4em]">
-                <span>Light Novel</span>
+              <div className="flex items-center flex-wrap gap-4">
+                <div className="flex items-center gap-3 text-primary font-black text-[9px] uppercase tracking-[0.4em]">
+                  <span>Light Novel</span>
+                </div>
+                {lastReadChapterId && (
+                  <button 
+                    onClick={() => onNavigate('READER', { slug, chapterId: lastReadChapterId })}
+                    className="flex items-center gap-2 px-3 py-1 rounded-lg bg-white/5 border border-white/5 text-primary text-[9px] font-black uppercase tracking-widest hover:bg-primary hover:text-white transition-all"
+                  >
+                    <BookOpen className="w-3.5 h-3.5" />
+                    <span>Bölüm {lastReadChapterId}&apos;de Kaldın</span>
+                  </button>
+                )}
               </div>
               <h1 className="text-4xl md:text-7xl font-display font-black tracking-tight uppercase leading-[0.9] drop-shadow-2xl">
                 {slug.replace(/-/g, ' ')}
