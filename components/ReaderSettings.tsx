@@ -15,20 +15,20 @@ export function ReaderSettings({ fontSize, setFontSize, fontFamily, setFontFamil
   const [isOpen, setIsOpen] = useState(false);
 
   const fontFamilies = [
-    { name: 'Sans', value: 'var(--font-sans)' },
-    { name: 'SF Pro', value: '-apple-system, BlinkMacSystemFont, "SF Pro Text", "SF Pro Display", "Helvetica Neue", Arial, sans-serif' },
-    { name: 'Serif', value: 'Georgia, serif' },
-    { name: 'Mono', value: 'ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace' },
+    { name: 'Sans (Inter)', value: 'var(--font-sans)' },
+    { name: 'Modern (Outfit)', value: 'var(--font-display)' },
+    { name: 'Ergonomik (Lora)', value: 'var(--font-reading)' },
+    { name: 'Monospace', value: 'ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace' },
   ];
 
   return (
     <div className="relative">
       <button
         onClick={() => setIsOpen(!isOpen)}
-        className="p-2.5 rounded-full bg-[#1c1c1e] hover:bg-[#2c2c2e] transition-colors border border-white/5"
+        className="p-2.5 rounded-xl hover:bg-white/5 transition-colors group"
         title="Okuma Ayarları"
       >
-        <Settings className="w-5 h-5" />
+        <Settings className="w-5 h-5 text-[#8E8E93] group-hover:text-primary transition-colors" />
       </button>
 
       <AnimatePresence>
@@ -42,11 +42,11 @@ export function ReaderSettings({ fontSize, setFontSize, fontFamily, setFontFamil
               initial={{ opacity: 0, y: 10, scale: 0.95 }}
               animate={{ opacity: 1, y: 0, scale: 1 }}
               exit={{ opacity: 0, y: 10, scale: 0.95 }}
-              className="absolute right-0 top-full mt-4 w-64 p-6 rounded-3xl bg-[#121212] border border-white/10 shadow-2xl z-50 space-y-6"
+              className="absolute right-0 top-full mt-4 w-64 p-6 rounded-3xl glass shadow-2xl z-50 space-y-6"
             >
               <div className="flex items-center justify-between">
-                <h3 className="font-bold flex items-center gap-2">
-                  <Type className="w-4 h-4 text-primary" />
+                <h3 className="font-display font-black uppercase text-xs tracking-widest flex items-center gap-2">
+                  <Type className="w-3.5 h-3.5 text-primary" />
                   Ayarlar
                 </h3>
                 <button onClick={() => setIsOpen(false)} className="text-[#8E8E93] hover:text-white">

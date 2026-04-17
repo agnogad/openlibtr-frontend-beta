@@ -24,14 +24,12 @@ const Logo = ({ onNavigate }: { onNavigate?: (view: string, params?: any) => voi
         onNavigate('LIBRARY');
       }
     }}
-    className="group flex items-center gap-2"
+    className="group flex items-center gap-2.5 transition-transform hover:scale-105 active:scale-95"
   >
-    <div className="w-10 h-10 rounded-xl bg-primary flex items-center justify-center shadow-lg shadow-primary/20 group-hover:scale-110 transition-transform">
-      <Library className="w-6 h-6 text-white" />
+    <div className="w-9 h-9 bg-primary flex items-center justify-center rounded-xl shadow-lg shadow-primary/20 transition-transform group-hover:rotate-6">
+      <Library className="w-5 h-5 text-white" />
     </div>
-    <span className="font-black text-2xl tracking-tighter uppercase">
-      OpenLib<span className="text-primary">TR</span>
-    </span>
+    <span className="text-lg font-display font-black tracking-tight text-white">OpenLib<span className="text-primary">TR</span></span>
   </Link>
 );
 
@@ -75,11 +73,11 @@ export function Navbar({ onNavigate, currentView, searchQuery, setSearchQuery }:
   return (
     <>
       {/* Top Header */}
-      <nav className="fixed top-0 left-0 right-0 z-50 bg-[#050505]/80 backdrop-blur-xl border-b border-white/5">
-        <div className="max-w-5xl mx-auto px-6 md:px-10">
-          <div className="flex items-center justify-between h-20 relative">
+      <nav className="fixed top-0 left-0 right-0 z-50 transition-all duration-300">
+        <div className="max-w-5xl mx-auto px-4 md:px-6 pt-4">
+          <div className="glass h-16 md:h-18 rounded-[2rem] flex items-center justify-between px-6 shadow-2xl shadow-black/40">
             {/* Desktop Layout */}
-            <div className="hidden md:flex items-center justify-between w-full">
+            <div className="hidden md:flex items-center justify-between w-full relative h-full">
               {/* Left Side */}
               <div className="flex-1 flex items-center">
                 {user ? (

@@ -39,8 +39,8 @@ export function ReaderView({ slug, chapterId, onNavigate }: ReaderViewProps) {
     restDelta: 0.001
   });
 
-  const [fontSize, setFontSize] = useState(18);
-  const [fontFamily, setFontFamily] = useState('var(--font-sans)');
+  const [fontSize, setFontSize] = useState(20);
+  const [fontFamily, setFontFamily] = useState('var(--font-reading)');
 
   useEffect(() => {
     const savedSize = localStorage.getItem('reader-font-size');
@@ -147,23 +147,23 @@ export function ReaderView({ slug, chapterId, onNavigate }: ReaderViewProps) {
     <div className="max-w-3xl mx-auto space-y-8 pb-20">
       {/* Immersive Header */}
       <motion.header 
-        className="fixed top-0 left-0 right-0 z-50 bg-[#050505]/80 backdrop-blur-xl border-b border-white/10 h-16"
+        className="fixed top-0 left-0 right-0 z-50 transition-all duration-300 px-4 pt-4"
       >
-        <div className="max-w-3xl mx-auto h-full px-6 flex items-center justify-between">
-          <div className="flex items-center gap-2">
-            <button onClick={() => onNavigate('NOVEL_DETAIL', { slug })} className="p-2 rounded-xl hover:bg-white/5 transition-colors" title="Bölüm Listesi">
-              <List className="w-5 h-5 text-[#8E8E93]" />
+        <div className="max-w-3xl mx-auto h-16 glass rounded-[2rem] px-4 md:px-6 flex items-center justify-between shadow-2xl shadow-black/40">
+          <div className="flex items-center gap-1">
+            <button onClick={() => onNavigate('NOVEL_DETAIL', { slug })} className="p-2.5 rounded-xl hover:bg-white/5 transition-colors group" title="Bölüm Listesi">
+              <List className="w-5 h-5 text-[#8E8E93] group-hover:text-primary transition-colors" />
             </button>
-            <button onClick={() => onNavigate('LIBRARY')} className="p-2 rounded-xl hover:bg-white/5 transition-colors" title="Ana Sayfa">
-              <Home className="w-5 h-5 text-[#8E8E93]" />
+            <button onClick={() => onNavigate('LIBRARY')} className="p-2.5 rounded-xl hover:bg-white/5 transition-colors group" title="Ana Sayfa">
+              <Home className="w-5 h-5 text-[#8E8E93] group-hover:text-primary transition-colors" />
             </button>
           </div>
 
-          <div className="flex-1 text-center px-4 truncate">
-            <p className="text-[10px] font-bold text-primary uppercase tracking-widest truncate">
+          <div className="flex-1 text-center px-4 overflow-hidden">
+            <p className="text-[9px] font-black text-primary uppercase tracking-[0.2em] truncate pointer-events-none">
               {slug.replace(/-/g, ' ')}
             </p>
-            <p className="text-xs font-bold truncate">Bölüm {id}</p>
+            <p className="text-xs font-black truncate font-display uppercase tracking-tight">Bölüm {id}</p>
           </div>
 
           <ReaderSettings 
@@ -175,9 +175,9 @@ export function ReaderView({ slug, chapterId, onNavigate }: ReaderViewProps) {
         </div>
 
         {/* Reading Progress Bar */}
-        <div className="absolute bottom-0 left-0 right-0 h-[2px] bg-white/5 pointer-events-none">
+        <div className="absolute bottom-4 left-6 right-6 h-[1.5px] bg-white/5 pointer-events-none rounded-full overflow-hidden">
           <motion.div
-            className="h-full bg-white shadow-[0_0_8px_rgba(255,255,255,0.8)]"
+            className="h-full bg-primary shadow-[0_0_8px_rgba(255,100,0,0.6)]"
             style={{ 
               scaleX,
               transformOrigin: "0%"

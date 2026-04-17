@@ -5,8 +5,15 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { ChevronLeft, ChevronRight, List, Calendar, BookOpen, Search, Play } from 'lucide-react';
 import { NovelConfig, fetchNovelConfig, getCoverUrl, getHistory, ReadingHistory } from '@/lib/api';
-import { motion } from 'motion/react';
+import { motion, AnimatePresence } from 'motion/react';
 import { cn } from '@/lib/utils';
+import { Vibrant } from 'node-vibrant/browser';
+
+interface ExtractedColors {
+  vibrant?: string;
+  darkVibrant?: string;
+  muted?: string;
+}
 
 interface NovelDetailViewProps {
   slug: string;
@@ -22,6 +29,24 @@ export function NovelDetailView({ slug, onNavigate, history }: NovelDetailViewPr
 
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 60;
+  const [colors, setColors] = useState<ExtractedColors>({});
+
+  useEffect(() => {
+    async function extractColors() {
+      try {
+        const coverUrl = getCoverUrl(slug);
+        const palette = await Vibrant.from(coverUrl).getPalette();
+        setColors({
+          vibrant: palette.Vibrant?.hex,
+          darkVibrant: palette.DarkVibrant?.hex,
+          muted: palette.Muted?.hex,
+        });
+      } catch (error) {
+        console.error('Color extraction failed:', error);
+      }
+    }
+    extractColors();
+  }, [slug]);
 
   useEffect(() => {
     async function loadData() {
@@ -77,7 +102,34 @@ export function NovelDetailView({ slug, onNavigate, history }: NovelDetailViewPr
   }
 
   return (
-    <div className="space-y-12 pb-20">
+    <div 
+      className="space-y-12 pb-20 relative min-h-screen"
+      style={{ 
+        '--primary': colors.vibrant || '#FF6400',
+        '--accent': colors.vibrant || '#FF6400',
+        '--ring': colors.vibrant || '#FF6400'
+      } as any}
+    >
+      {/* Dynamic Background Glow */}
+      <div className="absolute -top-40 -left-40 w-[600px] h-[600px] bg-[var(--primary)]/10 blur-[150px] rounded-full pointer-events-none opacity-40 animate-pulse" />
+      <div className="absolute top-1/2 -right-40 w-[500px] h-[500px] bg-[var(--primary)]/5 blur-[120px] rounded-full pointer-events-none opacity-30" />
+
+      <motion.div
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        key={slug + "-bg"}
+        className="fixed inset-0 -z-10 overflow-hidden pointer-events-none"
+      >
+        <Image
+          src={getCoverUrl(slug)}
+          alt=""
+          fill
+          className="object-cover opacity-10 blur-[100px] scale-110"
+          referrerPolicy="no-referrer"
+        />
+        <div className="absolute inset-0 bg-gradient-to-b from-[#0A0A0B]/0 via-[#0A0A0B]/60 to-[#0A0A0B]" />
+      </motion.div>
+
       <button 
         onClick={() => onNavigate('LIBRARY')} 
         className="inline-flex items-center gap-2.5 text-[11px] font-bold uppercase tracking-[0.2em] text-[#8E8E93] hover:text-white transition-all group"
@@ -123,48 +175,48 @@ export function NovelDetailView({ slug, onNavigate, history }: NovelDetailViewPr
           )}
         </div>
 
-        <div className="flex-1 space-y-12">
+        <div className="flex-1 space-y-12 pt-4">
           <div className="space-y-6">
             <motion.div
               initial={{ opacity: 0, x: 20 }}
               animate={{ opacity: 1, x: 0 }}
               className="space-y-4"
             >
-              <div className="flex items-center gap-3 text-primary font-bold text-[10px] uppercase tracking-[0.3em]">
-                <BookOpen className="w-4 h-4" />
+              <div className="flex items-center gap-3 text-primary font-black text-[9px] uppercase tracking-[0.4em]">
+                <div className="w-1.5 h-1.5 rounded-full bg-primary shadow-[0_0_8px_rgba(255,100,0,0.8)]" />
                 <span>Light Novel</span>
               </div>
-              <h1 className="text-4xl md:text-6xl font-black tracking-tighter uppercase leading-none">
+              <h1 className="text-4xl md:text-7xl font-display font-black tracking-tight uppercase leading-[0.9] drop-shadow-2xl">
                 {slug.replace(/-/g, ' ')}
               </h1>
-              <div className="flex flex-wrap gap-6 text-[11px] font-bold uppercase tracking-widest text-[#8E8E93]">
+              <div className="flex flex-wrap gap-6 text-[10px] font-black uppercase tracking-[0.2em] text-muted-foreground">
                 <div className="flex items-center gap-2">
                   <List className="w-4 h-4 text-primary" />
                   <span>{config.total_chapters} Bölüm</span>
                 </div>
                 <div className="flex items-center gap-2">
                   <Calendar className="w-4 h-4 text-primary" />
-                  <span>Güncel</span>
+                  <span>Güncel Seri</span>
                 </div>
               </div>
             </motion.div>
           </div>
 
           <div className="space-y-8">
-            <div id="chapter-list-header" className="flex flex-col sm:flex-row sm:items-center justify-between gap-6 border-b border-white/5 pb-8">
-              <h2 className="text-2xl font-black uppercase tracking-tight flex items-center gap-3">
-                <List className="w-6 h-6 text-primary" />
+            <div id="chapter-list-header" className="flex flex-col sm:flex-row sm:items-center justify-between gap-6 border-b border-white/5 pb-10">
+              <h2 className="text-2xl font-display font-black uppercase tracking-tight flex items-center gap-4">
+                <div className="w-2 h-8 bg-primary rounded-full shadow-[0_0_15px_rgba(255,100,0,0.4)]" />
                 Bölüm Listesi
               </h2>
               
               <div className="relative group max-w-xs w-full">
-                <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-[#8E8E93] group-focus-within:text-primary transition-colors" />
+                <Search className="absolute left-5 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground group-focus-within:text-primary transition-colors" />
                 <input
                   type="text"
                   placeholder="Bölüm ara..."
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
-                  className="w-full h-12 pl-12 pr-4 bg-[#121212] border border-white/5 rounded-2xl focus:outline-none focus:ring-2 focus:ring-primary/50 transition-all text-sm font-bold placeholder:text-[#444]"
+                  className="w-full h-12 pl-14 pr-6 bg-white/5 border border-white/5 rounded-2xl focus:outline-none focus:ring-2 focus:ring-primary/20 transition-all text-sm font-black placeholder:text-[#444]"
                 />
               </div>
             </div>
