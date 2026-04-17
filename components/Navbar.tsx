@@ -26,7 +26,7 @@ const Logo = ({ onNavigate }: { onNavigate?: (view: string, params?: any) => voi
     }}
     className="group flex items-center gap-2.5 transition-transform hover:scale-105 active:scale-95"
   >
-    <div className="w-9 h-9 bg-primary flex items-center justify-center rounded-xl shadow-lg shadow-primary/20 transition-transform group-hover:rotate-6">
+    <div className="w-9 h-9 bg-primary flex items-center justify-center rounded-xl transition-transform group-hover:rotate-6">
       <Library className="w-5 h-5 text-white" />
     </div>
     <span className="text-lg font-display font-black tracking-tight text-white">OpenLib<span className="text-primary">TR</span></span>

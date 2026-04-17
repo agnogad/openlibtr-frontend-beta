@@ -7,13 +7,6 @@ import { ChevronLeft, ChevronRight, List, Calendar, BookOpen, Search, Play } fro
 import { NovelConfig, fetchNovelConfig, getCoverUrl, getHistory, ReadingHistory } from '@/lib/api';
 import { motion, AnimatePresence } from 'motion/react';
 import { cn } from '@/lib/utils';
-import { Vibrant } from 'node-vibrant/browser';
-
-interface ExtractedColors {
-  vibrant?: string;
-  darkVibrant?: string;
-  muted?: string;
-}
 
 interface NovelDetailViewProps {
   slug: string;
@@ -29,24 +22,6 @@ export function NovelDetailView({ slug, onNavigate, history }: NovelDetailViewPr
 
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 60;
-  const [colors, setColors] = useState<ExtractedColors>({});
-
-  useEffect(() => {
-    async function extractColors() {
-      try {
-        const coverUrl = getCoverUrl(slug);
-        const palette = await Vibrant.from(coverUrl).getPalette();
-        setColors({
-          vibrant: palette.Vibrant?.hex,
-          darkVibrant: palette.DarkVibrant?.hex,
-          muted: palette.Muted?.hex,
-        });
-      } catch (error) {
-        console.error('Color extraction failed:', error);
-      }
-    }
-    extractColors();
-  }, [slug]);
 
   useEffect(() => {
     async function loadData() {
@@ -102,50 +77,9 @@ export function NovelDetailView({ slug, onNavigate, history }: NovelDetailViewPr
   }
 
   return (
-    <div 
-      className="space-y-12 pb-20 relative min-h-screen"
-      style={{ 
-        '--primary': colors.vibrant || '#FF6400',
-        '--accent': colors.vibrant || '#FF6400',
-        '--ring': colors.vibrant || '#FF6400'
-      } as any}
-    >
-      {/* Immersive Global Background - Optimized for performance */}
-      <div className="fixed inset-0 -z-10 overflow-hidden pointer-events-none">
-        {/* Extracted Color Base Tint */}
-        <div 
-          className="absolute inset-0 transition-colors duration-1000" 
-          style={{ 
-            backgroundColor: colors.darkVibrant ? `${colors.darkVibrant}33` : '#0A0A0B' 
-          }} 
-        />
-
-        {/* Static Glows - Removed heavy animations and reduced blur */}
-        <div 
-          className="absolute -top-40 -left-20 w-[600px] h-[600px] rounded-full blur-[100px] opacity-20 transition-colors duration-1000 will-change-transform"
-          style={{ backgroundColor: colors.vibrant || '#FF6400' }}
-        />
-        
-        <div 
-          className="absolute top-1/2 -right-40 w-[500px] h-[500px] rounded-full blur-[80px] opacity-10 transition-colors duration-1000 will-change-transform"
-          style={{ backgroundColor: colors.vibrant || '#FF6400' }}
-        />
-
-        {/* Optimized Blurred Cover Image */}
-        <div className="absolute inset-0 opacity-15 blur-[60px] scale-110 transition-opacity duration-700">
-           <Image
-            src={getCoverUrl(slug)}
-            alt=""
-            fill
-            className="object-cover"
-            referrerPolicy="no-referrer"
-            priority
-          />
-        </div>
-        
-        {/* Gradients for depth and readability */}
-        <div className="absolute inset-0 bg-gradient-to-b from-[#0A0A0B]/40 via-[#0A0A0B]/80 to-[#0A0A0B]" />
-      </div>
+    <div className="space-y-12 pb-20 relative min-h-screen">
+      {/* Background - Simplified to strictly black */}
+      <div className="fixed inset-0 -z-10 bg-black pointer-events-none" />
 
       <button 
         onClick={() => onNavigate('LIBRARY')} 
@@ -200,7 +134,6 @@ export function NovelDetailView({ slug, onNavigate, history }: NovelDetailViewPr
               className="space-y-4"
             >
               <div className="flex items-center gap-3 text-primary font-black text-[9px] uppercase tracking-[0.4em]">
-                <div className="w-1.5 h-1.5 rounded-full bg-primary shadow-[0_0_8px_rgba(255,100,0,0.8)]" />
                 <span>Light Novel</span>
               </div>
               <h1 className="text-4xl md:text-7xl font-display font-black tracking-tight uppercase leading-[0.9] drop-shadow-2xl">
@@ -222,7 +155,6 @@ export function NovelDetailView({ slug, onNavigate, history }: NovelDetailViewPr
           <div className="space-y-8">
             <div id="chapter-list-header" className="flex flex-col sm:flex-row sm:items-center justify-between gap-6 border-b border-white/5 pb-10">
               <h2 className="text-2xl font-display font-black uppercase tracking-tight flex items-center gap-4">
-                <div className="w-2 h-8 bg-primary rounded-full shadow-[0_0_15px_rgba(255,100,0,0.4)]" />
                 Bölüm Listesi
               </h2>
               
@@ -266,7 +198,7 @@ export function NovelDetailView({ slug, onNavigate, history }: NovelDetailViewPr
                       </span>
                       {isRead && (
                         <div className="absolute top-1.5 right-1.5 md:top-2 md:right-2">
-                          <div className="w-1.5 h-1.5 md:w-2 md:h-2 bg-primary rounded-full shadow-[0_0_10px_rgba(255,100,0,0.8)]" />
+                          <div className="w-1.5 h-1.5 md:w-2 md:h-2 bg-primary rounded-full" />
                         </div>
                       )}
                       <div className="absolute inset-x-0 bottom-0 py-1 bg-primary/0 group-hover:bg-primary/10 transition-colors">

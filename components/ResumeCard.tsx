@@ -22,11 +22,14 @@ export function ResumeCard({ data, onNavigate }: ResumeCardProps) {
     <motion.div
       initial={{ opacity: 0, y: 10 }}
       animate={{ opacity: 1, y: 0 }}
-      className="resume-glow rounded-[2rem] p-5 md:p-6"
+      whileHover={{ scale: 1.01 }}
+      className="resume-glow rounded-[2.5rem] p-6 md:p-8 relative group overflow-hidden"
     >
-      <div className="relative z-10 flex items-center justify-between gap-6">
-        <div className="flex items-center gap-5">
-          <div className="relative w-14 h-20 shrink-0 rounded-xl overflow-hidden shadow-2xl bg-[#1c1c1e] border border-white/5 group-hover:scale-105 transition-transform duration-500">
+      <div className="absolute inset-0 bg-gradient-to-r from-primary/10 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-700" />
+      
+      <div className="relative z-10 flex items-center justify-between gap-8">
+        <div className="flex items-center gap-6">
+          <div className="relative w-16 h-24 md:w-20 md:h-28 shrink-0 rounded-2xl overflow-hidden shadow-2xl bg-[#1c1c1e] border border-white/10 group-hover:rotate-2 transition-transform duration-500">
             <Image
               src={getCoverUrl(data.slug)}
               alt={data.novelTitle}
@@ -35,28 +38,24 @@ export function ResumeCard({ data, onNavigate }: ResumeCardProps) {
               referrerPolicy="no-referrer"
             />
           </div>
-          <div className="space-y-1.5 md:space-y-2">
-            <div className="flex items-center gap-2.5 text-primary font-black text-[8px] md:text-[9px] uppercase tracking-[0.3em]">
-              <div className="w-1.5 h-1.5 rounded-full bg-primary shadow-[0_0_8px_rgba(255,100,0,0.8)]" />
-              <span>Okumaya Devam Et</span>
+          <div className="space-y-2 md:space-y-4">
+            <div className="flex items-center gap-3 text-primary font-black text-[9px] md:text-[10px] uppercase tracking-[0.4em]">
+              <span>Kaldığın Seri</span>
             </div>
-            <h2 className="text-lg md:text-xl font-display font-black tracking-tight uppercase leading-none line-clamp-1">{data.novelTitle}</h2>
-            <div className="flex items-center gap-3 text-[10px] md:text-[11px] font-black uppercase tracking-widest text-muted-foreground">
-              <span>Bölüm {data.chapterId}</span>
-              <span className="w-1 h-1 rounded-full bg-white/10" />
-              <button 
-                onClick={handleClick}
-                className="text-primary hover:underline underline-offset-4"
-              >
-                Hemen Dön
-              </button>
+            <div className="space-y-1">
+              <h2 className="text-xl md:text-3xl font-display font-black tracking-tight uppercase leading-[0.9] line-clamp-1">{data.novelTitle}</h2>
+              <div className="flex items-center gap-4 text-[10px] md:text-[11px] font-black uppercase tracking-[0.2em] text-[#8E8E93]">
+                <span className="text-white">Bölüm {data.chapterId}</span>
+                <span className="w-1.5 h-1.5 rounded-full bg-white/5" />
+                <span className="opacity-50">Son Okuma</span>
+              </div>
             </div>
           </div>
         </div>
         
         <button
           onClick={handleClick}
-          className="hidden md:flex shrink-0 px-8 py-3.5 rounded-2xl bg-white/5 border border-white/10 text-white text-[10px] font-black uppercase tracking-widest hover:bg-primary hover:border-primary transition-all active:scale-95"
+          className="hidden sm:flex shrink-0 px-10 py-5 rounded-2xl bg-primary text-white text-[11px] font-black uppercase tracking-widest shadow-xl shadow-primary/20 hover:scale-105 active:scale-95 transition-all group-hover:shadow-[0_0_30px_rgba(255,100,0,0.4)]"
         >
           Devam Et
         </button>

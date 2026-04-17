@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { User, Settings, LogOut, BookOpen, Heart, Bell, ChevronRight, LogIn, UserPlus, Globe } from 'lucide-react';
+import { User, Settings, LogOut, BookOpen, Heart, Bell, ChevronRight, LogIn, UserPlus, Globe, Sparkles } from 'lucide-react';
 import { motion } from 'motion/react';
 import { supabase } from '@/lib/supabase';
 import type { User as SupabaseUser } from '@supabase/supabase-js';
@@ -99,35 +99,34 @@ export function ProfileView({ onNavigate }: ProfileViewProps) {
 
   return (
     <div className="max-w-2xl mx-auto space-y-8 pb-20">
-      <header className="flex items-center gap-3 mb-8">
-        <User className="w-8 h-8 text-primary" />
-        <h1 className="text-3xl font-bold tracking-tight">Profil</h1>
+      <header className="flex items-center gap-4 mb-10 border-b border-white/5 pb-8">
+        <h1 className="text-3xl font-display font-black uppercase tracking-tight">Profil</h1>
       </header>
 
       {!user ? (
         <motion.div
           initial={{ opacity: 0, scale: 0.95 }}
           animate={{ opacity: 1, scale: 1 }}
-          className="p-8 rounded-3xl bg-[#121212] border border-white/10 text-center space-y-6 shadow-2xl"
+          className="p-10 rounded-[2.5rem] bg-white/5 border border-white/5 text-center space-y-8 shadow-2xl backdrop-blur-xl"
         >
-          <div className="w-20 h-20 bg-primary/10 rounded-full flex items-center justify-center mx-auto">
-            <User className="w-10 h-10 text-primary" />
+          <div className="w-24 h-24 bg-primary/10 rounded-3xl flex items-center justify-center mx-auto rotate-3">
+            <User className="w-12 h-12 text-primary" />
           </div>
-          <div className="space-y-2">
-            <h2 className="text-2xl font-bold">Henüz giriş yapmadınız</h2>
-            <p className="text-[#8E8E93]">Favorilerinizi kaydetmek ve okuma geçmişinizi senkronize etmek için giriş yapın.</p>
+          <div className="space-y-3">
+            <h2 className="text-3xl font-display font-black uppercase tracking-tight">Giriş Yapılmadı</h2>
+            <p className="text-sm text-[#8E8E93] max-w-sm mx-auto leading-relaxed">Favorilerinizi kaydetmek ve okuma geçmişinizi tüm cihazlarınızda senkronize etmek için hesabınıza bağlanın.</p>
           </div>
           <div className="flex flex-col sm:flex-row gap-4 justify-center pt-4">
             <button
               onClick={() => onNavigate('LOGIN')}
-              className="flex-1 flex items-center justify-center gap-2 px-6 py-3 rounded-xl bg-primary text-white font-bold hover:opacity-90 transition-opacity"
+              className="flex-1 flex items-center justify-center gap-3 px-8 py-4 rounded-2xl bg-primary text-white text-xs font-black uppercase tracking-widest shadow-xl shadow-primary/20 hover:scale-[1.02] active:scale-[0.98] transition-all"
             >
               <LogIn className="w-5 h-5" />
               <span>Giriş Yap</span>
             </button>
             <button
               onClick={() => onNavigate('SIGNUP')}
-              className="flex-1 flex items-center justify-center gap-2 px-6 py-3 rounded-xl bg-white/5 border border-white/10 text-white font-bold hover:bg-white/10 transition-colors"
+              className="flex-1 flex items-center justify-center gap-3 px-8 py-4 rounded-2xl bg-white/5 border border-white/10 text-white text-xs font-black uppercase tracking-widest hover:bg-white/10 transition-all"
             >
               <UserPlus className="w-5 h-5" />
               <span>Kayıt Ol</span>
@@ -135,46 +134,50 @@ export function ProfileView({ onNavigate }: ProfileViewProps) {
           </div>
         </motion.div>
       ) : (
-        <div className="space-y-6">
+        <div className="space-y-8">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
-            className="p-6 rounded-3xl bg-[#121212] border border-white/10 flex items-center gap-6 shadow-xl"
+            className="p-8 rounded-[2.5rem] bg-white/5 border border-white/5 flex flex-col md:flex-row items-center md:items-start gap-8 shadow-2xl relative overflow-hidden group"
           >
-            <div className="w-20 h-20 rounded-2xl bg-primary flex items-center justify-center text-3xl font-bold text-white shadow-lg shadow-primary/20">
+            <div className="absolute top-0 right-0 w-32 h-32 bg-white/5 blur-3xl rounded-full" />
+            <div className="w-28 h-28 rounded-3xl bg-white/10 flex items-center justify-center text-4xl font-display font-black text-white shadow-2xl shadow-white/5 rotate-2 group-hover:rotate-0 transition-transform duration-500">
               {user.user_metadata?.full_name?.[0] || user.email?.[0]?.toUpperCase() || 'U'}
             </div>
-            <div className="flex-1">
-              <h2 className="text-2xl font-bold">{user.user_metadata?.full_name || 'Kullanıcı'}</h2>
-              <p className="text-[#8E8E93]">{user.email}</p>
-              <div className="mt-2 inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-primary/10 text-primary border border-primary/20">
-                Üye
+            <div className="flex-1 text-center md:text-left space-y-4">
+              <div className="space-y-1">
+                <h2 className="text-3xl font-display font-black uppercase tracking-tight">{user.user_metadata?.full_name || 'Kullanıcı'}</h2>
+                <p className="text-sm font-black tracking-widest text-[#8E8E93] uppercase opacity-60">{user.email}</p>
+              </div>
+              <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full text-[10px] font-black uppercase tracking-[0.2em] bg-white/5 text-white/60 border border-white/10">
+                <Sparkles className="w-3.5 h-3.5" />
+                Daimi Üye
               </div>
             </div>
           </motion.div>
 
-          <div className="grid gap-3">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             {menuItems.map((item, index) => (
               <motion.button
                 key={item.name}
-                initial={{ opacity: 0, x: -20 }}
-                animate={{ opacity: 1, x: 0 }}
+                initial={{ opacity: 0, y: 10 }}
+                animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: index * 0.05 }}
-                className="flex items-center justify-between p-5 rounded-2xl bg-[#121212] border border-white/10 hover:bg-[#1c1c1e] transition-all group"
+                className="flex items-center justify-between p-6 rounded-3xl bg-white/5 border border-white/5 hover:bg-white/10 hover:border-primary/20 transition-all group"
               >
                 <div className="flex items-center gap-4">
-                  <div className="p-2.5 rounded-xl bg-white/5 text-[#8E8E93] group-hover:text-primary transition-colors">
+                  <div className="p-3 rounded-2xl bg-white/5 text-[#8E8E93] group-hover:text-primary group-hover:bg-primary/10 transition-all">
                     <item.icon className="w-5 h-5" />
                   </div>
-                  <span className="font-semibold">{item.name}</span>
+                  <span className="text-sm font-black uppercase tracking-widest">{item.name}</span>
                 </div>
                 <div className="flex items-center gap-3">
                   {item.count !== null && item.count !== '0' && (
-                    <span className="text-xs font-bold px-2 py-1 rounded-md bg-primary/10 text-primary">
+                    <span className="text-[10px] font-black px-2.5 py-1 rounded-lg bg-primary text-white shadow-lg shadow-primary/20 uppercase">
                       {item.count}
                     </span>
                   )}
-                  <ChevronRight className="w-5 h-5 text-[#8E8E93] group-hover:text-primary transition-transform group-hover:translate-x-1" />
+                  <ChevronRight className="w-5 h-5 text-[#444] group-hover:text-primary transition-transform group-hover:translate-x-1" />
                 </div>
               </motion.button>
             ))}
@@ -184,33 +187,41 @@ export function ProfileView({ onNavigate }: ProfileViewProps) {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.3 }}
-            className="p-6 rounded-3xl bg-[#121212] border border-white/10 space-y-4"
+            className="p-8 rounded-[2.5rem] bg-white/5 border border-white/5 space-y-6"
           >
-            <h3 className="font-bold flex items-center gap-2">
-              <Settings className="w-5 h-5 text-primary" />
-              Tema Rengi
-            </h3>
-            <div className="grid grid-cols-4 sm:grid-cols-8 gap-3">
-              {themeColors.map((theme) => (
-                <button
-                  key={theme.color}
-                  onClick={() => changeThemeColor(theme.color)}
-                  className="group relative flex flex-col items-center gap-2"
-                  title={theme.name}
-                >
-                  <div 
-                    className={cn(
-                      "w-10 h-10 rounded-full border-2 transition-all group-hover:scale-110 group-active:scale-95 flex items-center justify-center",
-                      activeColor === theme.color ? "border-white scale-110 shadow-lg shadow-white/10" : "border-white/10"
-                    )}
-                    style={{ backgroundColor: theme.color }}
+            <div className="flex items-center gap-3">
+              <div className="w-10 h-10 rounded-xl bg-primary/10 flex items-center justify-center">
+                <Settings className="w-5 h-5 text-primary" />
+              </div>
+              <h3 className="text-xl font-display font-black uppercase tracking-tight">Kişiselleştirme</h3>
+            </div>
+            
+            <div className="space-y-4">
+              <p className="text-[10px] font-black uppercase tracking-[0.3em] text-[#444]">Tema Rengi Seçin</p>
+              <div className="flex flex-wrap gap-3">
+                {themeColors.map((theme) => (
+                  <button
+                    key={theme.color}
+                    onClick={() => changeThemeColor(theme.color)}
+                    className="group relative"
+                    title={theme.name}
                   >
-                    {activeColor === theme.color && (
-                      <div className="w-2 h-2 rounded-full bg-white shadow-sm" />
-                    )}
-                  </div>
-                </button>
-              ))}
+                    <div 
+                      className={cn(
+                        "w-12 h-12 rounded-2xl border-4 transition-all duration-300 flex items-center justify-center",
+                        activeColor === theme.color 
+                          ? "border-white scale-110 shadow-[0_0_20px_rgba(255,255,255,0.1)]" 
+                          : "border-transparent opacity-60 hover:opacity-100 hover:scale-105"
+                      )}
+                      style={{ backgroundColor: theme.color }}
+                    >
+                      {activeColor === theme.color && (
+                        <div className="w-2.5 h-2.5 rounded-full bg-white shadow-inner" />
+                      )}
+                    </div>
+                  </button>
+                ))}
+              </div>
             </div>
           </motion.div>
 
@@ -218,48 +229,52 @@ export function ProfileView({ onNavigate }: ProfileViewProps) {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.35 }}
-            className="p-6 rounded-3xl bg-[#121212] border border-white/10 space-y-6"
+            className="p-8 rounded-[2.5rem] bg-white/5 border border-white/5 space-y-6"
           >
             <div className="flex items-center justify-between">
-              <h3 className="font-bold flex items-center gap-2">
-                <Globe className="w-5 h-5 text-primary" />
-                Proxy Ayarları
-              </h3>
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 rounded-xl bg-primary/10 flex items-center justify-center">
+                  <Globe className="w-5 h-5 text-primary" />
+                </div>
+                <h3 className="text-xl font-display font-black uppercase tracking-tight">Bağlantı Ayarları</h3>
+              </div>
               <button
                 onClick={() => updateProxyConfig({ enabled: !proxyConfig.enabled })}
                 className={cn(
-                  "relative inline-flex h-6 w-11 items-center rounded-full transition-colors focus:outline-none",
-                  proxyConfig.enabled ? "bg-primary" : "bg-white/10"
+                  "relative inline-flex h-7 w-14 items-center rounded-full transition-all duration-500 focus:outline-none",
+                  proxyConfig.enabled ? "bg-primary shadow-[0_0_15px_rgba(255,100,0,0.3)]" : "bg-white/10"
                 )}
               >
                 <span
                   className={cn(
-                    "inline-block h-4 w-4 transform rounded-full bg-white transition-transform",
-                    proxyConfig.enabled ? "translate-x-6" : "translate-x-1"
+                    "inline-block h-5 w-5 transform rounded-full bg-white transition-all duration-500 shadow-md",
+                    proxyConfig.enabled ? "translate-x-8" : "translate-x-1"
                   )}
                 />
               </button>
             </div>
 
             {proxyConfig.enabled && (
-              <div className="space-y-3 animate-in fade-in slide-in-from-top-2 duration-300">
-                <p className="text-xs font-bold uppercase tracking-wider text-[#8E8E93]">Proxy Sağlayıcı Seçin</p>
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+              <div className="space-y-4 animate-in fade-in slide-in-from-top-4 duration-500">
+                <div className="h-[1px] w-full bg-white/5" />
+                <p className="text-[10px] font-black uppercase tracking-[0.3em] text-[#444]">GitHub Proxy Sağlayıcılar</p>
+                <div className="grid grid-cols-2 gap-3">
                   {proxyProviders.map((provider) => (
                     <button
                       key={provider}
                       onClick={() => updateProxyConfig({ provider })}
                       className={cn(
-                        "px-4 py-3 rounded-xl text-sm font-medium transition-all text-left border",
+                        "px-6 py-4 rounded-2xl text-[10px] font-black uppercase tracking-widest transition-all text-center border-2",
                         proxyConfig.provider === provider
                           ? "bg-primary/10 border-primary text-primary"
-                          : "bg-white/5 border-transparent text-[#8E8E93] hover:text-white hover:bg-white/10"
+                          : "bg-white/5 border-transparent text-[#444] hover:text-white hover:bg-white/10"
                       )}
                     >
-                      {provider}
+                      {provider.split('.')[0]}
                     </button>
                   ))}
                 </div>
+                <p className="text-[9px] text-muted-foreground italic text-center">İçerik yükleme hataları alıyorsanız farklı bir sağlayıcı deneyin.</p>
               </div>
             )}
           </motion.div>
@@ -268,10 +283,10 @@ export function ProfileView({ onNavigate }: ProfileViewProps) {
 
           <button
             onClick={handleLogout}
-            className="w-full flex items-center justify-center gap-2 p-5 rounded-2xl bg-destructive/10 border border-destructive/20 text-destructive font-bold hover:bg-destructive/20 transition-all"
+            className="w-full flex items-center justify-center gap-3 py-6 rounded-[2rem] bg-destructive/5 border border-destructive/20 text-destructive text-xs font-black uppercase tracking-[0.2em] hover:bg-destructive hover:text-white transition-all group"
           >
-            <LogOut className="w-5 h-5" />
-            <span>Çıkış Yap</span>
+            <LogOut className="w-5 h-5 group-hover:scale-110 transition-transform" />
+            <span>Oturumu Kapat</span>
           </button>
         </div>
       )}

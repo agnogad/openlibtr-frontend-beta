@@ -72,9 +72,9 @@ export function LibraryView({ onNavigate, novels, history, searchQuery }: Librar
               </motion.div>
 
               {/* Dynamic Overlay Layers */}
-              <div className="absolute inset-0 bg-gradient-to-t from-[#0A0A0B] via-[#0A0A0B]/40 to-transparent" />
-              <div className="absolute inset-0 bg-gradient-to-r from-[#0A0A0B]/80 via-transparent to-transparent hidden md:block" />
-              <div className="absolute inset-0 bg-black/5 backdrop-blur-[2px]" />
+              <div className="absolute inset-0 bg-gradient-to-t from-black via-black/60 to-transparent" />
+              <div className="absolute inset-0 bg-gradient-to-r from-black/90 via-transparent to-transparent hidden md:block" />
+              <div className="absolute inset-0 bg-black/20 backdrop-blur-[1px]" />
               
               {/* Content Container */}
               <div className="absolute inset-0 flex flex-col justify-end p-8 md:p-20 pb-20 md:pb-24">
@@ -85,9 +85,9 @@ export function LibraryView({ onNavigate, novels, history, searchQuery }: Librar
                     transition={{ delay: 0.3, duration: 0.8 }}
                     className="space-y-4"
                   >
-                    <div className="inline-flex items-center gap-3 px-4 py-1.5 rounded-full bg-primary/20 border border-primary/30 backdrop-blur-3xl shadow-[0_0_20px_rgba(255,100,0,0.2)]">
-                      <Sparkles className="w-3 h-3 text-primary animate-pulse" />
-                      <span className="text-[10px] font-black uppercase tracking-[0.3em] text-primary">Öne Çıkan Seri</span>
+                    <div className="inline-flex items-center gap-3 px-4 py-1.5 rounded-full bg-white/5 border border-white/10 backdrop-blur-3xl shadow-xl">
+                      <Sparkles className="w-3 h-3 text-[#8E8E93]" />
+                      <span className="text-[10px] font-black uppercase tracking-[0.3em] text-[#8E8E93]">Öne Çıkan Seri</span>
                     </div>
                     
                     <h1 className="text-4xl md:text-8xl font-display font-black tracking-tighter uppercase leading-[0.85] drop-shadow-[0_10px_30px_rgba(0,0,0,0.5)]">
@@ -180,32 +180,45 @@ export function LibraryView({ onNavigate, novels, history, searchQuery }: Librar
       {!searchQuery && resumeData && (
         <section className="space-y-6">
           <div className="flex items-center justify-between">
-            <h2 className="text-2xl font-black uppercase tracking-tight flex items-center gap-3">
-              <Clock className="w-6 h-6 text-primary" />
+            <h2 className="text-2xl font-display font-black uppercase tracking-tight flex items-center gap-4">
               Okumaya Devam Et
             </h2>
           </div>
-          <ResumeCard data={resumeData} onNavigate={onNavigate} />
+          <motion.div
+            initial={{ opacity: 0, y: 30 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.6 }}
+          >
+            <ResumeCard data={resumeData} onNavigate={onNavigate} />
+          </motion.div>
         </section>
       )}
 
 
       {/* Novels Grid */}
-      <section className="space-y-8">
-        <div className="flex items-center justify-between">
-          <h2 className="text-2xl font-black uppercase tracking-tight flex items-center gap-3">
-            <Library className="w-6 h-6 text-primary" />
+      <section className="space-y-10">
+        <div className="flex items-center justify-between border-b border-white/5 pb-8">
+          <h2 className="text-2xl font-display font-black uppercase tracking-tight flex items-center gap-4">
             {searchQuery ? 'Arama Sonuçları' : 'Tüm Kütüphane'}
           </h2>
-          <span className="text-[10px] font-black uppercase tracking-[0.2em] text-[#444]">
+          <div className="px-4 py-1.5 rounded-full bg-white/5 border border-white/5 text-[10px] font-black uppercase tracking-[0.2em] text-[#444]">
             {filteredNovels.length} Seri Bulundu
-          </span>
+          </div>
         </div>
 
         {filteredNovels.length > 0 ? (
-          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-6 md:gap-8">
-            {filteredNovels.map((novel) => (
-              <NovelCard key={novel.slug} novel={novel} onNavigate={onNavigate} />
+          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-6 md:gap-10">
+            {filteredNovels.map((novel, index) => (
+              <motion.div
+                key={novel.slug}
+                initial={{ opacity: 0, scale: 0.9 }}
+                whileInView={{ opacity: 1, scale: 1 }}
+                viewport={{ once: true, margin: "-100px" }}
+                transition={{ duration: 0.4, delay: (index % 5) * 0.05 }}
+              >
+                <NovelCard novel={novel} onNavigate={onNavigate} />
+              </motion.div>
             ))}
           </div>
         ) : (

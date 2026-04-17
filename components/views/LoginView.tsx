@@ -50,51 +50,57 @@ export function LoginView({ onNavigate }: LoginViewProps) {
   };
 
   return (
-    <div className="flex flex-col items-center justify-center min-h-[70vh] pb-20">
+    <div className="flex flex-col items-center justify-center min-h-[70vh] pb-20 pt-10">
       <motion.div
-        initial={{ opacity: 0, y: 20 }}
+        initial={{ opacity: 0, y: 30 }}
         animate={{ opacity: 1, y: 0 }}
-        className="w-full max-w-md p-8 rounded-3xl bg-[#121212] border border-white/10 shadow-2xl"
+        className="w-full max-w-md p-10 rounded-[3rem] glass shadow-2xl space-y-8 relative overflow-hidden"
       >
-        <div className="text-center mb-8">
-          <h1 className="text-3xl font-bold mb-2">Hoş Geldiniz</h1>
-          <p className="text-[#8E8E93]">Hesabınıza giriş yapın</p>
+        <div className="absolute top-0 right-0 w-32 h-32 bg-primary/5 blur-3xl rounded-full" />
+        
+        <div className="text-center space-y-3">
+          <h1 className="text-4xl font-display font-black uppercase tracking-tight">Hoş Geldiniz</h1>
+          <p className="text-sm font-black uppercase tracking-[0.2em] text-[#8E8E93] opacity-60">Serüveninize Kaldığınız Yerden Devam Edin</p>
         </div>
 
         {error && (
-          <div className="mb-6 p-4 rounded-xl bg-destructive/10 border border-destructive/20 text-destructive text-sm flex items-center gap-3">
+          <motion.div
+            initial={{ opacity: 0, scale: 0.95 }}
+            animate={{ opacity: 1, scale: 1 }}
+            className="p-4 rounded-2xl bg-destructive/10 border border-destructive/20 text-destructive text-[10px] font-black uppercase tracking-widest flex items-center gap-3"
+          >
             <AlertCircle className="w-5 h-5 shrink-0" />
             <p>{error}</p>
-          </div>
+          </motion.div>
         )}
 
-        <form className="space-y-4" onSubmit={handleLogin}>
+        <form className="space-y-6" onSubmit={handleLogin}>
           <div className="space-y-2">
-            <label className="text-sm font-medium text-[#8E8E93] ml-1">E-posta</label>
+            <label className="text-[10px] font-black uppercase tracking-[0.3em] text-[#444] ml-1">E-posta Adresi</label>
             <div className="relative group">
-              <Mail className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-[#8E8E93] group-focus-within:text-primary transition-colors" />
+              <Mail className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-[#444] group-focus-within:text-primary transition-colors duration-300" />
               <input
                 type="email"
                 required
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
-                placeholder="ornek@mail.com"
-                className="w-full h-12 pl-12 pr-4 bg-[#1c1c1e] border border-white/10 rounded-xl focus:outline-none focus:ring-1 focus:ring-primary transition-all"
+                placeholder="seruven@mail.com"
+                className="w-full h-14 pl-12 pr-4 bg-white/5 border border-white/10 rounded-2xl focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary/50 text-sm font-bold transition-all placeholder:text-[#222]"
               />
             </div>
           </div>
 
           <div className="space-y-2">
-            <label className="text-sm font-medium text-[#8E8E93] ml-1">Şifre</label>
+            <label className="text-[10px] font-black uppercase tracking-[0.3em] text-[#444] ml-1">Şifre</label>
             <div className="relative group">
-              <Lock className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-[#8E8E93] group-focus-within:text-primary transition-colors" />
+              <Lock className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-[#444] group-focus-within:text-primary transition-colors duration-300" />
               <input
                 type="password"
                 required
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 placeholder="••••••••"
-                className="w-full h-12 pl-12 pr-4 bg-[#1c1c1e] border border-white/10 rounded-xl focus:outline-none focus:ring-1 focus:ring-primary transition-all"
+                className="w-full h-14 pl-12 pr-4 bg-white/5 border border-white/10 rounded-2xl focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary/50 text-sm font-bold transition-all placeholder:text-[#222]"
               />
             </div>
           </div>
@@ -102,10 +108,10 @@ export function LoginView({ onNavigate }: LoginViewProps) {
           <button
             type="submit"
             disabled={loading}
-            className="w-full h-12 bg-primary text-white font-bold rounded-xl hover:opacity-90 transition-opacity flex items-center justify-center gap-2 mt-6 disabled:opacity-50"
+            className="w-full h-14 bg-primary text-white font-black text-xs uppercase tracking-[0.3em] rounded-2xl shadow-xl shadow-primary/20 hover:scale-[1.02] active:scale-[0.98] transition-all flex items-center justify-center gap-3 disabled:opacity-50"
           >
             {loading ? (
-              <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin" />
+              <div className="w-6 h-6 border-2 border-white border-t-transparent rounded-full animate-spin" />
             ) : (
               <>
                 <span>Giriş Yap</span>
@@ -115,26 +121,26 @@ export function LoginView({ onNavigate }: LoginViewProps) {
           </button>
         </form>
 
-        <div className="relative my-8">
+        <div className="relative my-10">
           <div className="absolute inset-0 flex items-center">
-            <div className="w-full border-t border-white/10"></div>
+            <div className="w-full border-t border-white/5"></div>
           </div>
-          <div className="relative flex justify-center text-xs uppercase">
-            <span className="bg-[#121212] px-2 text-[#8E8E93]">Veya şununla devam et</span>
+          <div className="relative flex justify-center text-[9px] font-black uppercase tracking-[0.4em]">
+            <span className="bg-[#0A0A0B] px-4 text-[#444]">Veya Şununla Bağlan</span>
           </div>
         </div>
 
         <button
           onClick={handleGithubLogin}
-          className="w-full h-12 bg-white/5 border border-white/10 text-white font-medium rounded-xl hover:bg-white/10 transition-colors flex items-center justify-center gap-3"
+          className="w-full h-14 bg-white/5 border border-white/10 text-white font-black text-xs uppercase tracking-[0.2em] rounded-2xl hover:bg-white/10 transition-all flex items-center justify-center gap-4 group"
         >
-          <Github className="w-5 h-5" />
-          <span>GitHub ile Giriş Yap</span>
+          <Github className="w-5 h-5 group-hover:scale-110 transition-transform" />
+          <span>GitHub Hesabı</span>
         </button>
 
-        <p className="text-center mt-8 text-[#8E8E93]">
-          Hesabınız yok mu?{' '}
-          <button onClick={() => onNavigate('SIGNUP')} className="text-primary font-bold hover:underline">
+        <p className="text-center mt-10 text-[10px] font-black uppercase tracking-widest text-[#444]">
+          Henüz bir hesabınız yok mu?{' '}
+          <button onClick={() => onNavigate('SIGNUP')} className="text-primary hover:underline">
             Kayıt Ol
           </button>
         </p>
