@@ -64,8 +64,12 @@ export function NovelCard({ novel, onNavigate }: NovelCardProps) {
           </h3>
           <div className="flex items-center gap-3 text-[9px] font-black uppercase tracking-widest text-muted-foreground">
             <span className="text-primary">{novel.chapterCount} Bölüm</span>
-            <span className="w-1 h-1 rounded-full bg-white/5" />
-            <span>Güncellendi</span>
+            {new Date(novel.lastUpdated).toDateString() === new Date().toDateString() && (
+              <>
+                <span className="w-1 h-1 rounded-full bg-white/5" />
+                <span className="text-green-500 animate-pulse">Güncellendi</span>
+              </>
+            )}
           </div>
         </div>
       </Link>

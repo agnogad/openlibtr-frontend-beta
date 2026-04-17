@@ -110,25 +110,42 @@ export function NovelDetailView({ slug, onNavigate, history }: NovelDetailViewPr
         '--ring': colors.vibrant || '#FF6400'
       } as any}
     >
-      {/* Dynamic Background Glow */}
-      <div className="absolute -top-40 -left-40 w-[600px] h-[600px] bg-[var(--primary)]/10 blur-[150px] rounded-full pointer-events-none opacity-40 animate-pulse" />
-      <div className="absolute top-1/2 -right-40 w-[500px] h-[500px] bg-[var(--primary)]/5 blur-[120px] rounded-full pointer-events-none opacity-30" />
-
-      <motion.div
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        key={slug + "-bg"}
-        className="fixed inset-0 -z-10 overflow-hidden pointer-events-none"
-      >
-        <Image
-          src={getCoverUrl(slug)}
-          alt=""
-          fill
-          className="object-cover opacity-10 blur-[100px] scale-110"
-          referrerPolicy="no-referrer"
+      {/* Immersive Global Background - Optimized for performance */}
+      <div className="fixed inset-0 -z-10 overflow-hidden pointer-events-none">
+        {/* Extracted Color Base Tint */}
+        <div 
+          className="absolute inset-0 transition-colors duration-1000" 
+          style={{ 
+            backgroundColor: colors.darkVibrant ? `${colors.darkVibrant}33` : '#0A0A0B' 
+          }} 
         />
-        <div className="absolute inset-0 bg-gradient-to-b from-[#0A0A0B]/0 via-[#0A0A0B]/60 to-[#0A0A0B]" />
-      </motion.div>
+
+        {/* Static Glows - Removed heavy animations and reduced blur */}
+        <div 
+          className="absolute -top-40 -left-20 w-[600px] h-[600px] rounded-full blur-[100px] opacity-20 transition-colors duration-1000 will-change-transform"
+          style={{ backgroundColor: colors.vibrant || '#FF6400' }}
+        />
+        
+        <div 
+          className="absolute top-1/2 -right-40 w-[500px] h-[500px] rounded-full blur-[80px] opacity-10 transition-colors duration-1000 will-change-transform"
+          style={{ backgroundColor: colors.vibrant || '#FF6400' }}
+        />
+
+        {/* Optimized Blurred Cover Image */}
+        <div className="absolute inset-0 opacity-15 blur-[60px] scale-110 transition-opacity duration-700">
+           <Image
+            src={getCoverUrl(slug)}
+            alt=""
+            fill
+            className="object-cover"
+            referrerPolicy="no-referrer"
+            priority
+          />
+        </div>
+        
+        {/* Gradients for depth and readability */}
+        <div className="absolute inset-0 bg-gradient-to-b from-[#0A0A0B]/40 via-[#0A0A0B]/80 to-[#0A0A0B]" />
+      </div>
 
       <button 
         onClick={() => onNavigate('LIBRARY')} 

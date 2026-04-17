@@ -44,79 +44,86 @@ export function LibraryView({ onNavigate, novels, history, searchQuery }: Librar
     <div className="space-y-12 pb-20">
       {/* Hero Slider Section */}
       {!searchQuery && featuredNovels.length > 0 && (
-        <section className="relative h-[400px] md:h-[480px] -mx-6 md:mx-0 overflow-hidden md:overflow-visible">
+        <section className="relative h-[480px] md:h-[600px] -mx-6 md:mx-0 group overflow-hidden md:rounded-[3rem] shadow-2xl">
           <AnimatePresence mode="wait">
             <motion.div
               key={currentSlide}
-              initial={{ opacity: 0, x: 20 }}
-              animate={{ opacity: 1, x: 0 }}
-              exit={{ opacity: 0, x: -20 }}
-              transition={{ duration: 0.6, ease: [0.4, 0, 0.2, 1] }}
-              drag="x"
-              dragConstraints={{ left: 0, right: 0 }}
-              onDragEnd={(_, info) => {
-                if (info.offset.x < -50) nextSlide();
-                if (info.offset.x > 50) prevSlide();
-              }}
-              className="absolute inset-0 rounded-none md:rounded-[2.5rem] overflow-hidden border-b md:border border-white/5 shadow-2xl cursor-grab active:cursor-grabbing"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              transition={{ duration: 1 }}
+              className="absolute inset-0"
             >
-              {/* Background Image with Parallax-like Zoom */}
+              {/* Immersive Background Image */}
               <motion.div 
-                initial={{ scale: 1.2 }}
-                animate={{ scale: 1.05 }}
-                transition={{ duration: 10, ease: "easeOut" }}
+                initial={{ scale: 1.15 }}
+                animate={{ scale: 1 }}
+                transition={{ duration: 8, ease: "easeOut" }}
                 className="absolute inset-0"
               >
                 <Image 
                   src={getCoverUrl(featuredNovels[currentSlide].slug)} 
                   alt={featuredNovels[currentSlide].title} 
                   fill
-                  className="w-full h-full object-cover select-none"
+                  className="w-full h-full object-cover"
                   referrerPolicy="no-referrer"
                   priority
                 />
               </motion.div>
 
-              {/* Refined Overlays - Slightly darker on mobile for text contrast */}
-              <div className="absolute inset-0 bg-gradient-to-t from-[#050505] via-[#050505]/60 md:via-[#050505]/40 to-transparent" />
-              <div className="absolute inset-0 bg-black/10 backdrop-blur-[1px]" />
+              {/* Dynamic Overlay Layers */}
+              <div className="absolute inset-0 bg-gradient-to-t from-[#0A0A0B] via-[#0A0A0B]/40 to-transparent" />
+              <div className="absolute inset-0 bg-gradient-to-r from-[#0A0A0B]/80 via-transparent to-transparent hidden md:block" />
+              <div className="absolute inset-0 bg-black/5 backdrop-blur-[2px]" />
               
-              {/* Content - More Compact & Modern */}
-              <div className="absolute inset-0 flex flex-col justify-end p-6 md:p-14 pb-16 md:pb-14">
-                <div className="max-w-3xl space-y-4 md:space-y-6">
+              {/* Content Container */}
+              <div className="absolute inset-0 flex flex-col justify-end p-8 md:p-20 pb-20 md:pb-24">
+                <div className="max-w-4xl space-y-6 md:space-y-8">
                   <motion.div 
-                    initial={{ opacity: 0, y: 15 }}
+                    initial={{ opacity: 0, y: 30 }}
                     animate={{ opacity: 1, y: 0 }}
-                    transition={{ delay: 0.1 }}
-                    className="space-y-2 md:space-y-3"
+                    transition={{ delay: 0.3, duration: 0.8 }}
+                    className="space-y-4"
                   >
-                    <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/10 border border-white/10 backdrop-blur-xl">
-                      <Sparkles className="w-2.5 h-2.5 text-primary" />
-                      <span className="text-[7px] md:text-[8px] font-black uppercase tracking-[0.25em] text-white/90">Editörün Seçimi</span>
+                    <div className="inline-flex items-center gap-3 px-4 py-1.5 rounded-full bg-primary/20 border border-primary/30 backdrop-blur-3xl shadow-[0_0_20px_rgba(255,100,0,0.2)]">
+                      <Sparkles className="w-3 h-3 text-primary animate-pulse" />
+                      <span className="text-[10px] font-black uppercase tracking-[0.3em] text-primary">Öne Çıkan Seri</span>
                     </div>
                     
-                    <h1 className="text-2xl md:text-5xl font-black tracking-tight uppercase leading-[1] md:leading-[0.95] drop-shadow-xl">
+                    <h1 className="text-4xl md:text-8xl font-display font-black tracking-tighter uppercase leading-[0.85] drop-shadow-[0_10px_30px_rgba(0,0,0,0.5)]">
                       {featuredNovels[currentSlide].title}
                     </h1>
+
+                    <div className="flex items-center gap-6 text-[11px] font-black uppercase tracking-[0.2em] text-white/50">
+                      <div className="flex items-center gap-2">
+                        <Library className="w-4 h-4 text-primary" />
+                        <span>{featuredNovels[currentSlide].chapterCount} Bölüm</span>
+                      </div>
+                      <div className="w-1 h-1 rounded-full bg-white/20" />
+                      <div>Popüler Seri</div>
+                    </div>
                   </motion.div>
                   
                   <motion.div 
-                    initial={{ opacity: 0, y: 15 }}
+                    initial={{ opacity: 0, y: 20 }}
                     animate={{ opacity: 1, y: 0 }}
-                    transition={{ delay: 0.2 }}
-                    className="flex flex-wrap items-center gap-3 md:gap-4"
+                    transition={{ delay: 0.5, duration: 0.8 }}
+                    className="flex flex-wrap items-center gap-4 md:gap-6"
                   >
                     <button 
                       onClick={() => onNavigate('NOVEL_DETAIL', { slug: featuredNovels[currentSlide].slug })}
-                      className="group relative px-6 md:px-8 py-3 md:py-4 rounded-xl bg-primary text-white font-black uppercase tracking-widest text-[9px] md:text-[10px] transition-all hover:shadow-[0_0_30px_rgba(255,100,0,0.3)] active:scale-95"
+                      className="group relative px-10 py-5 rounded-2xl bg-primary text-white font-black uppercase tracking-widest text-[11px] transition-all hover:scale-105 hover:shadow-[0_20px_40px_rgba(255,100,0,0.3)] active:scale-95 overflow-hidden"
                     >
-                      <span className="relative z-10">Keşfet</span>
+                      <div className="absolute inset-0 bg-white/20 translate-y-full group-hover:translate-y-0 transition-transform duration-500" />
+                      <span className="relative z-10 flex items-center gap-2">
+                        Hemen Oku <ChevronRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
+                      </span>
                     </button>
 
                     {resumeData && resumeData.slug === featuredNovels[currentSlide].slug && (
                       <button 
                         onClick={() => onNavigate('READER', { slug: resumeData.slug, chapterId: resumeData.chapterId })}
-                        className="px-6 md:px-8 py-3 md:py-4 rounded-xl bg-white/5 backdrop-blur-xl border border-white/10 text-white font-black uppercase tracking-widest text-[9px] md:text-[10px] hover:bg-white/20 transition-all"
+                        className="px-10 py-5 rounded-2xl bg-white/5 backdrop-blur-2xl border border-white/10 text-white font-black uppercase tracking-widest text-[11px] hover:bg-white/10 transition-all border-b-primary/50"
                       >
                         Bölüm {resumeData.chapterId}&apos;den Devam Et
                       </button>
@@ -127,36 +134,43 @@ export function LibraryView({ onNavigate, novels, history, searchQuery }: Librar
             </motion.div>
           </AnimatePresence>
 
-          {/* Minimalist Controls - Re-positioned for better mobile accessibility */}
-          <div className="absolute bottom-6 left-6 right-6 md:bottom-8 md:right-12 md:left-auto flex items-center justify-between md:justify-end gap-6 z-10">
-            <div className="flex gap-1.5 md:gap-2">
+          {/* Slider Controls */}
+          <div className="absolute bottom-10 right-10 flex items-center gap-4 z-20">
+            <div className="flex items-center gap-1.5 bg-black/40 backdrop-blur-2xl p-2 rounded-2xl border border-white/5">
               {featuredNovels.map((_, i) => (
                 <button
                   key={i}
                   onClick={() => setCurrentSlide(i)}
-                  className="group py-2"
+                  className="p-1"
                 >
                   <div className={cn(
-                    "h-1 rounded-full transition-all duration-500",
-                    currentSlide === i ? "w-8 md:w-10 bg-primary" : "w-3 md:w-4 bg-white/20 group-hover:bg-white/40"
+                    "h-1.5 rounded-full transition-all duration-700",
+                    currentSlide === i ? "w-10 bg-primary" : "w-2 bg-white/20 hover:bg-white/40"
                   )} />
                 </button>
               ))}
             </div>
             
-            <div className="hidden md:flex items-center gap-2">
+            <div className="flex items-center gap-2">
               <button 
                 onClick={prevSlide}
-                className="w-10 h-10 rounded-xl bg-white/5 backdrop-blur-xl border border-white/10 flex items-center justify-center hover:bg-white/10 transition-all text-white"
+                className="w-14 h-14 rounded-2xl glass flex items-center justify-center hover:bg-primary hover:border-primary transition-all text-white group"
               >
-                <ChevronLeft className="w-5 h-5" />
+                <ChevronLeft className="w-6 h-6 group-hover:-translate-x-1 transition-transform" />
               </button>
               <button 
                 onClick={nextSlide}
-                className="w-10 h-10 rounded-xl bg-white/5 backdrop-blur-xl border border-white/10 flex items-center justify-center hover:bg-white/10 transition-all text-white"
+                className="w-14 h-14 rounded-2xl glass flex items-center justify-center hover:bg-primary hover:border-primary transition-all text-white group"
               >
-                <ChevronRight className="w-5 h-5" />
+                <ChevronRight className="w-6 h-6 group-hover:translate-x-1 transition-transform" />
               </button>
+            </div>
+          </div>
+
+          {/* Side Indicator Labels - Desktop Only */}
+          <div className="absolute left-10 top-1/2 -translate-y-1/2 hidden xl:flex flex-col gap-10 z-20">
+            <div className="rotate-90 origin-left text-[10px] font-black uppercase tracking-[0.5em] text-white/20 whitespace-nowrap">
+              OpenLibTR Premium Reader
             </div>
           </div>
         </section>
