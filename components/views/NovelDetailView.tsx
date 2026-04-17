@@ -20,6 +20,9 @@ export function NovelDetailView({ slug, onNavigate, history }: NovelDetailViewPr
   const [searchQuery, setSearchQuery] = useState('');
   const [lastReadChapterId, setLastReadChapterId] = useState<number | null>(null);
 
+  const [currentPage, setCurrentPage] = useState(1);
+  const itemsPerPage = 60;
+
   useEffect(() => {
     async function loadData() {
       try {
@@ -39,10 +42,21 @@ export function NovelDetailView({ slug, onNavigate, history }: NovelDetailViewPr
     loadData();
   }, [slug, history]);
 
+  // Reset to page 1 when searching
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [searchQuery]);
+
   const filteredChapters = config?.chapters.filter(chapter => 
     chapter.id.toString().includes(searchQuery) || 
     chapter.title.toLowerCase().includes(searchQuery.toLowerCase())
   ) || [];
+
+  const totalPages = Math.ceil(filteredChapters.length / itemsPerPage);
+  const currentChapters = filteredChapters.slice(
+    (currentPage - 1) * itemsPerPage,
+    currentPage * itemsPerPage
+  );
 
   if (loading) {
     return (
@@ -137,7 +151,7 @@ export function NovelDetailView({ slug, onNavigate, history }: NovelDetailViewPr
           </div>
 
           <div className="space-y-8">
-            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-6 border-b border-white/5 pb-8">
+            <div id="chapter-list-header" className="flex flex-col sm:flex-row sm:items-center justify-between gap-6 border-b border-white/5 pb-8">
               <h2 className="text-2xl font-black uppercase tracking-tight flex items-center gap-3">
                 <List className="w-6 h-6 text-primary" />
                 Bölüm Listesi
@@ -155,61 +169,119 @@ export function NovelDetailView({ slug, onNavigate, history }: NovelDetailViewPr
               </div>
             </div>
 
-            <div className="grid gap-3 max-h-[800px] overflow-y-auto pr-4 no-scrollbar">
-              {filteredChapters.map((chapter, index) => {
+            <div className="grid grid-cols-4 sm:grid-cols-6 md:grid-cols-8 lg:grid-cols-10 gap-2 md:gap-3">
+              {currentChapters.map((chapter, index) => {
                 const isRead = lastReadChapterId !== null && chapter.id <= lastReadChapterId;
                 return (
                   <motion.div
                     key={chapter.id}
-                    initial={{ opacity: 0, x: 20 }}
-                    animate={{ opacity: 1, x: 0 }}
-                    transition={{ delay: index * 0.02 }}
+                    initial={{ opacity: 0, scale: 0.9 }}
+                    animate={{ opacity: 1, scale: 1 }}
+                    transition={{ delay: (index % 20) * 0.01 }}
                   >
                     <button
                       onClick={() => onNavigate('READER', { slug, chapterId: chapter.id })}
                       className={cn(
-                        "w-full flex items-center justify-between p-5 rounded-2xl border transition-all group",
+                        "w-full aspect-square flex flex-col items-center justify-center rounded-xl md:rounded-2xl border transition-all group relative overflow-hidden",
                         isRead 
-                          ? "bg-primary/5 border-primary/20 hover:bg-primary/10" 
-                          : "bg-[#121212] border-white/5 hover:bg-[#1c1c1e] hover:border-white/10"
+                          ? "bg-primary/10 border-primary/30 hover:bg-primary/20" 
+                          : "bg-[#121212] border-white/5 hover:bg-[#1c1c1e] hover:border-primary/40 hover:scale-105"
                       )}
+                      title={`Bölüm ${chapter.id}${chapter.title ? ': ' + chapter.title : ''}`}
                     >
-                      <div className="flex items-center gap-4">
-                        <div className={cn(
-                          "w-10 h-10 rounded-xl flex items-center justify-center text-xs font-black transition-all",
-                          isRead ? "bg-primary text-white" : "bg-white/5 text-[#8E8E93] group-hover:bg-primary group-hover:text-white"
+                      <span className={cn(
+                        "text-sm md:text-base font-black transition-colors",
+                        isRead ? "text-primary" : "text-white group-hover:text-primary"
+                      )}>
+                        {chapter.id}
+                      </span>
+                      {isRead && (
+                        <div className="absolute top-1.5 right-1.5 md:top-2 md:right-2">
+                          <div className="w-1.5 h-1.5 md:w-2 md:h-2 bg-primary rounded-full shadow-[0_0_10px_rgba(255,100,0,0.8)]" />
+                        </div>
+                      )}
+                      <div className="absolute inset-x-0 bottom-0 py-1 bg-primary/0 group-hover:bg-primary/10 transition-colors">
+                        <p className={cn(
+                          "text-[7px] md:text-[8px] font-black uppercase tracking-tighter opacity-0 group-hover:opacity-100 transition-all",
+                          isRead ? "text-primary/70" : "text-primary"
                         )}>
-                          {chapter.id}
-                        </div>
-                        <div className="space-y-0.5 text-left">
-                          <span className={cn(
-                            "text-sm font-bold transition-colors",
-                            isRead ? "text-primary" : "text-white group-hover:text-primary"
-                          )}>
-                            Bölüm {chapter.id}
-                          </span>
-                          {isRead && (
-                            <p className="text-[9px] font-black uppercase tracking-widest text-primary/60">Okundu</p>
-                          )}
-                        </div>
+                          OKU
+                        </p>
                       </div>
-                      <ChevronRight className={cn(
-                        "w-5 h-5 transition-all group-hover:translate-x-1",
-                        isRead ? "text-primary/60" : "text-[#444] group-hover:text-primary"
-                      )} />
                     </button>
                   </motion.div>
                 );
               })}
-              {filteredChapters.length === 0 && (
-                <div className="text-center py-20 space-y-4">
-                  <div className="w-16 h-16 bg-[#121212] rounded-full flex items-center justify-center mx-auto border border-white/5">
-                    <Search className="w-6 h-6 text-[#444]" />
-                  </div>
-                  <p className="text-sm font-bold uppercase tracking-widest text-[#444]">Bölüm bulunamadı</p>
-                </div>
-              )}
             </div>
+
+            {filteredChapters.length === 0 && (
+              <div className="text-center py-20 space-y-4">
+                <div className="w-16 h-16 bg-[#121212] rounded-full flex items-center justify-center mx-auto border border-white/5">
+                  <Search className="w-6 h-6 text-[#444]" />
+                </div>
+                <p className="text-sm font-bold uppercase tracking-widest text-[#444]">Bölüm bulunamadı</p>
+              </div>
+            )}
+
+            {/* Pagination Controls */}
+            {totalPages > 1 && (
+              <div className="flex flex-wrap items-center justify-center gap-2 pt-10 border-t border-white/5">
+                <button
+                  onClick={() => {
+                    setCurrentPage(p => Math.max(1, p - 1));
+                    document.getElementById('chapter-list-header')?.scrollIntoView({ behavior: 'smooth' });
+                  }}
+                  disabled={currentPage === 1}
+                  className="w-10 h-10 rounded-xl bg-white/5 border border-white/5 flex items-center justify-center disabled:opacity-30 hover:bg-white/10 transition-all"
+                >
+                  <ChevronLeft className="w-5 h-5" />
+                </button>
+                
+                <div className="flex items-center gap-1">
+                  {Array.from({ length: Math.min(5, totalPages) }, (_, i) => {
+                    let pageNum;
+                    if (totalPages <= 5) {
+                      pageNum = i + 1;
+                    } else if (currentPage <= 3) {
+                      pageNum = i + 1;
+                    } else if (currentPage >= totalPages - 2) {
+                      pageNum = totalPages - 4 + i;
+                    } else {
+                      pageNum = currentPage - 2 + i;
+                    }
+
+                    return (
+                      <button
+                        key={pageNum}
+                        onClick={() => {
+                          setCurrentPage(pageNum);
+                          document.getElementById('chapter-list-header')?.scrollIntoView({ behavior: 'smooth' });
+                        }}
+                        className={cn(
+                          "w-10 h-10 rounded-xl font-bold text-xs transition-all border",
+                          currentPage === pageNum 
+                            ? "bg-primary border-primary text-white shadow-lg shadow-primary/20" 
+                            : "bg-white/5 border-white/5 text-[#8E8E93] hover:bg-white/10"
+                        )}
+                      >
+                        {pageNum}
+                      </button>
+                    );
+                  })}
+                </div>
+
+                <button
+                  onClick={() => {
+                    setCurrentPage(p => Math.min(totalPages, p + 1));
+                    document.getElementById('chapter-list-header')?.scrollIntoView({ behavior: 'smooth' });
+                  }}
+                  disabled={currentPage === totalPages}
+                  className="w-10 h-10 rounded-xl bg-white/5 border border-white/5 flex items-center justify-center disabled:opacity-30 hover:bg-white/10 transition-all"
+                >
+                  <ChevronRight className="w-5 h-5" />
+                </button>
+              </div>
+            )}
           </div>
         </div>
       </div>
