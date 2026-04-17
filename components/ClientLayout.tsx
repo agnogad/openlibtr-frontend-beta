@@ -12,7 +12,7 @@ export function ClientLayout({ children }: { children: React.ReactNode }) {
   return (
     <>
       {!isReaderPage && !isHomePage && <Navbar />}
-      <main className={isReaderPage ? "max-w-3xl mx-auto px-6 py-8 -mt-24" : isHomePage ? "" : "max-w-5xl mx-auto px-6 md:px-10 py-8"}>
+      <main className={isReaderPage ? "max-w-3xl mx-auto px-6 py-8 -mt-20" : isHomePage ? "" : "max-w-5xl mx-auto px-6 md:px-10 py-8"}>
         {children}
       </main>
     </>

@@ -44,52 +44,58 @@ export function LibraryView({ onNavigate, novels, history, searchQuery }: Librar
     <div className="space-y-12 pb-20">
       {/* Hero Slider Section */}
       {!searchQuery && featuredNovels.length > 0 && (
-        <section className="relative h-[380px] md:h-[480px] -mx-6 md:mx-0">
+        <section className="relative h-[400px] md:h-[480px] -mx-6 md:mx-0 overflow-hidden md:overflow-visible">
           <AnimatePresence mode="wait">
             <motion.div
               key={currentSlide}
-              initial={{ opacity: 0, scale: 0.98 }}
-              animate={{ opacity: 1, scale: 1 }}
-              exit={{ opacity: 0, scale: 1.02 }}
-              transition={{ duration: 0.8, ease: [0.4, 0, 0.2, 1] }}
-              className="absolute inset-0 rounded-none md:rounded-[2.5rem] overflow-hidden border border-white/5 shadow-2xl"
+              initial={{ opacity: 0, x: 20 }}
+              animate={{ opacity: 1, x: 0 }}
+              exit={{ opacity: 0, x: -20 }}
+              transition={{ duration: 0.6, ease: [0.4, 0, 0.2, 1] }}
+              drag="x"
+              dragConstraints={{ left: 0, right: 0 }}
+              onDragEnd={(_, info) => {
+                if (info.offset.x < -50) nextSlide();
+                if (info.offset.x > 50) prevSlide();
+              }}
+              className="absolute inset-0 rounded-none md:rounded-[2.5rem] overflow-hidden border-b md:border border-white/5 shadow-2xl cursor-grab active:cursor-grabbing"
             >
               {/* Background Image with Parallax-like Zoom */}
               <motion.div 
-                initial={{ scale: 1.15 }}
+                initial={{ scale: 1.2 }}
                 animate={{ scale: 1.05 }}
-                transition={{ duration: 8, ease: "linear" }}
+                transition={{ duration: 10, ease: "easeOut" }}
                 className="absolute inset-0"
               >
                 <Image 
                   src={getCoverUrl(featuredNovels[currentSlide].slug)} 
                   alt={featuredNovels[currentSlide].title} 
                   fill
-                  className="w-full h-full object-cover"
+                  className="w-full h-full object-cover select-none"
                   referrerPolicy="no-referrer"
                   priority
                 />
               </motion.div>
 
-              {/* Refined Overlays */}
-              <div className="absolute inset-0 bg-gradient-to-t from-[#050505] via-[#050505]/40 to-transparent" />
-              <div className="absolute inset-0 bg-black/10 backdrop-blur-[2px]" />
+              {/* Refined Overlays - Slightly darker on mobile for text contrast */}
+              <div className="absolute inset-0 bg-gradient-to-t from-[#050505] via-[#050505]/60 md:via-[#050505]/40 to-transparent" />
+              <div className="absolute inset-0 bg-black/10 backdrop-blur-[1px]" />
               
               {/* Content - More Compact & Modern */}
-              <div className="absolute inset-0 flex flex-col justify-end p-8 md:p-14">
-                <div className="max-w-3xl space-y-6">
+              <div className="absolute inset-0 flex flex-col justify-end p-6 md:p-14 pb-16 md:pb-14">
+                <div className="max-w-3xl space-y-4 md:space-y-6">
                   <motion.div 
                     initial={{ opacity: 0, y: 15 }}
                     animate={{ opacity: 1, y: 0 }}
-                    transition={{ delay: 0.2 }}
-                    className="space-y-3"
+                    transition={{ delay: 0.1 }}
+                    className="space-y-2 md:space-y-3"
                   >
                     <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/10 border border-white/10 backdrop-blur-xl">
-                      <Sparkles className="w-3 h-3 text-primary" />
-                      <span className="text-[8px] font-black uppercase tracking-[0.25em] text-white/90">Editörün Seçimi</span>
+                      <Sparkles className="w-2.5 h-2.5 text-primary" />
+                      <span className="text-[7px] md:text-[8px] font-black uppercase tracking-[0.25em] text-white/90">Editörün Seçimi</span>
                     </div>
                     
-                    <h1 className="text-3xl md:text-5xl font-black tracking-tight uppercase leading-[0.95] drop-shadow-xl">
+                    <h1 className="text-2xl md:text-5xl font-black tracking-tight uppercase leading-[1] md:leading-[0.95] drop-shadow-xl">
                       {featuredNovels[currentSlide].title}
                     </h1>
                   </motion.div>
@@ -97,12 +103,12 @@ export function LibraryView({ onNavigate, novels, history, searchQuery }: Librar
                   <motion.div 
                     initial={{ opacity: 0, y: 15 }}
                     animate={{ opacity: 1, y: 0 }}
-                    transition={{ delay: 0.3 }}
-                    className="flex flex-wrap items-center gap-4"
+                    transition={{ delay: 0.2 }}
+                    className="flex flex-wrap items-center gap-3 md:gap-4"
                   >
                     <button 
                       onClick={() => onNavigate('NOVEL_DETAIL', { slug: featuredNovels[currentSlide].slug })}
-                      className="group relative px-8 py-4 rounded-xl bg-primary text-white font-black uppercase tracking-widest text-[10px] overflow-hidden transition-all hover:shadow-[0_0_30px_rgba(255,100,0,0.3)] active:scale-95"
+                      className="group relative px-6 md:px-8 py-3 md:py-4 rounded-xl bg-primary text-white font-black uppercase tracking-widest text-[9px] md:text-[10px] transition-all hover:shadow-[0_0_30px_rgba(255,100,0,0.3)] active:scale-95"
                     >
                       <span className="relative z-10">Keşfet</span>
                     </button>
@@ -110,7 +116,7 @@ export function LibraryView({ onNavigate, novels, history, searchQuery }: Librar
                     {resumeData && resumeData.slug === featuredNovels[currentSlide].slug && (
                       <button 
                         onClick={() => onNavigate('READER', { slug: resumeData.slug, chapterId: resumeData.chapterId })}
-                        className="px-8 py-4 rounded-xl bg-white/5 backdrop-blur-xl border border-white/10 text-white font-black uppercase tracking-widest text-[10px] hover:bg-white/10 transition-all"
+                        className="px-6 md:px-8 py-3 md:py-4 rounded-xl bg-white/5 backdrop-blur-xl border border-white/10 text-white font-black uppercase tracking-widest text-[9px] md:text-[10px] hover:bg-white/20 transition-all"
                       >
                         Bölüm {resumeData.chapterId}&apos;den Devam Et
                       </button>
@@ -121,9 +127,9 @@ export function LibraryView({ onNavigate, novels, history, searchQuery }: Librar
             </motion.div>
           </AnimatePresence>
 
-          {/* Minimalist Controls */}
-          <div className="absolute bottom-8 right-8 md:right-12 flex items-center gap-6 z-10">
-            <div className="flex gap-2">
+          {/* Minimalist Controls - Re-positioned for better mobile accessibility */}
+          <div className="absolute bottom-6 left-6 right-6 md:bottom-8 md:right-12 md:left-auto flex items-center justify-between md:justify-end gap-6 z-10">
+            <div className="flex gap-1.5 md:gap-2">
               {featuredNovels.map((_, i) => (
                 <button
                   key={i}
@@ -132,13 +138,13 @@ export function LibraryView({ onNavigate, novels, history, searchQuery }: Librar
                 >
                   <div className={cn(
                     "h-1 rounded-full transition-all duration-500",
-                    currentSlide === i ? "w-10 bg-primary" : "w-4 bg-white/20 group-hover:bg-white/40"
+                    currentSlide === i ? "w-8 md:w-10 bg-primary" : "w-3 md:w-4 bg-white/20 group-hover:bg-white/40"
                   )} />
                 </button>
               ))}
             </div>
             
-            <div className="flex items-center gap-2">
+            <div className="hidden md:flex items-center gap-2">
               <button 
                 onClick={prevSlide}
                 className="w-10 h-10 rounded-xl bg-white/5 backdrop-blur-xl border border-white/10 flex items-center justify-center hover:bg-white/10 transition-all text-white"
