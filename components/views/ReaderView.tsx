@@ -63,9 +63,22 @@ export function ReaderView({ slug, chapterId, onNavigate, novels }: ReaderViewPr
         if (!chapter) throw new Error('Bölüm bulunamadı');
         
         const text = await fetchChapterContent(slug, chapter.path);
-        setContent(text);
         
-        const words = text.split(/\s+/).length;
+        // Clean up text: trim excessive whitespace from lines
+        const cleanedText = text
+          .split('\n')
+          .map(line => {
+            // Remove excessive leading whitespace that often triggers code block formatting
+            // or pushes text out of view. We preserve common indentation but cap it.
+            let cleaned = line.replace(/^\s{4,}/, ' '); // Replace 4+ spaces with 1 space
+            return cleaned.trimEnd(); // Keep indentation but clean the end
+          })
+          .filter((line, i, arr) => line !== '' || (i > 0 && arr[i-1] !== '')) // Remove redundant empty lines
+          .join('\n');
+
+        setContent(cleanedText);
+        
+        const words = cleanedText.split(/\s+/).length;
         setReadingTime(Math.ceil(words / 200));
 
         await saveToHistory({
@@ -210,7 +223,7 @@ export function ReaderView({ slug, chapterId, onNavigate, novels }: ReaderViewPr
         initial={{ opacity: 0, y: 10 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.5 }}
-        className="markdown-body prose prose-invert max-w-none text-white/90 leading-relaxed"
+        className="markdown-body prose prose-invert max-w-none text-white/90 leading-relaxed break-words overflow-x-hidden"
         style={{ 
           fontSize: `${fontSize}px`, 
           fontFamily: fontFamily,

@@ -139,6 +139,8 @@ body {
   font-size: 1.15rem;
   color: rgba(248, 248, 248, 0.95);
   font-family: var(--font-reading);
+  word-break: break-word;
+  overflow-wrap: break-word;
 }
 
 .markdown-body p {
