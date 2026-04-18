@@ -4,7 +4,7 @@ import { useState, useEffect } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { ChevronLeft, ChevronRight, List, Calendar, BookOpen, Search, Play } from 'lucide-react';
-import { NovelConfig, fetchNovelConfig, getCoverUrl, getHistory, ReadingHistory } from '@/lib/api';
+import { NovelConfig, fetchNovelConfig, getCoverUrl, getHistory, ReadingHistory, Novel } from '@/lib/api';
 import { motion, AnimatePresence } from 'motion/react';
 import { cn } from '@/lib/utils';
 
@@ -12,9 +12,13 @@ interface NovelDetailViewProps {
   slug: string;
   onNavigate: (view: string, params?: any) => void;
   history: ReadingHistory[];
+  novels: Novel[];
 }
 
-export function NovelDetailView({ slug, onNavigate, history }: NovelDetailViewProps) {
+export function NovelDetailView({ slug, onNavigate, history, novels }: NovelDetailViewProps) {
+  const novel = novels.find(n => n.slug === slug);
+  const novelTitle = novel?.title || slug.replace(/-/g, ' ');
+
   const [config, setConfig] = useState<NovelConfig | null>(null);
   const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState('');
@@ -148,7 +152,7 @@ export function NovelDetailView({ slug, onNavigate, history }: NovelDetailViewPr
                 )}
               </div>
               <h1 className="text-4xl md:text-7xl font-display font-black tracking-tight uppercase leading-[0.9] drop-shadow-2xl">
-                {slug.replace(/-/g, ' ')}
+                {novelTitle}
               </h1>
               <div className="flex flex-wrap gap-6 text-[10px] font-black uppercase tracking-[0.2em] text-muted-foreground">
                 <div className="flex items-center gap-2">

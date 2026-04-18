@@ -9,6 +9,7 @@ import {
   saveToHistory, 
   saveResume 
 } from '@/lib/api';
+import type { Novel } from '@/lib/api';
 import ReactMarkdown from 'react-markdown';
 import { GiscusComments } from '@/components/GiscusComments';
 import { ReaderSettings } from '@/components/ReaderSettings';
@@ -19,10 +20,13 @@ interface ReaderViewProps {
   slug: string;
   chapterId: number;
   onNavigate: (view: string, params?: any) => void;
+  novels: Novel[];
 }
 
-export function ReaderView({ slug, chapterId, onNavigate }: ReaderViewProps) {
+export function ReaderView({ slug, chapterId, onNavigate, novels }: ReaderViewProps) {
   const id = chapterId;
+  const novel = novels.find(n => n.slug === slug);
+  const novelTitle = novel?.title || slug.replace(/-/g, ' ');
   
   const [config, setConfig] = useState<NovelConfig | null>(null);
   const [content, setContent] = useState<string>('');
@@ -64,7 +68,6 @@ export function ReaderView({ slug, chapterId, onNavigate }: ReaderViewProps) {
         const words = text.split(/\s+/).length;
         setReadingTime(Math.ceil(words / 200));
 
-        const novelTitle = slug.replace(/-/g, ' ').toUpperCase();
         await saveToHistory({
           slug,
           novelTitle,
@@ -86,7 +89,7 @@ export function ReaderView({ slug, chapterId, onNavigate }: ReaderViewProps) {
       }
     }
     loadData();
-  }, [slug, id]);
+  }, [slug, id, novelTitle]);
 
   const nextChapter = config?.chapters.find(c => c.id === id + 1);
   const prevChapter = config?.chapters.find(c => c.id === id - 1);
@@ -161,7 +164,7 @@ export function ReaderView({ slug, chapterId, onNavigate }: ReaderViewProps) {
 
           <div className="flex-1 text-center px-4 overflow-hidden">
             <p className="text-[9px] font-black text-primary uppercase tracking-[0.2em] truncate pointer-events-none">
-              {slug.replace(/-/g, ' ')}
+              {novelTitle}
             </p>
             <p className="text-xs font-black truncate font-display uppercase tracking-tight">Bölüm {id}</p>
           </div>

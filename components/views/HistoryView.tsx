@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { Trash2, Clock, BookOpen, ChevronRight, AlertCircle } from 'lucide-react';
-import { ReadingHistory, getHistory, clearHistory as clearHistoryApi } from '@/lib/api';
+import { ReadingHistory, getHistory, clearHistory as clearHistoryApi, Novel } from '@/lib/api';
 import { formatDistanceToNow } from 'date-fns';
 import { tr } from 'date-fns/locale';
 import { motion, AnimatePresence } from 'motion/react';
@@ -10,9 +10,10 @@ import { motion, AnimatePresence } from 'motion/react';
 interface HistoryViewProps {
   onNavigate: (view: string, params?: any) => void;
   initialHistory: ReadingHistory[];
+  novels: Novel[];
 }
 
-export function HistoryView({ onNavigate, initialHistory }: HistoryViewProps) {
+export function HistoryView({ onNavigate, initialHistory, novels }: HistoryViewProps) {
   const [history, setHistory] = useState<ReadingHistory[]>(initialHistory);
   const [loading, setLoading] = useState(false);
   const [showConfirmClear, setShowConfirmClear] = useState(false);
@@ -118,38 +119,43 @@ export function HistoryView({ onNavigate, initialHistory }: HistoryViewProps) {
       ) : (
         <div className="grid gap-4">
           <AnimatePresence mode="popLayout">
-            {history.map((item, index) => (
-              <motion.div
-                key={`${item.slug}-${item.timestamp}`}
-                initial={{ opacity: 0, y: 10 }}
-                animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, scale: 0.95 }}
-                transition={{ delay: index * 0.03, duration: 0.4 }}
-              >
-                <button
-                  onClick={() => onNavigate('READER', { slug: item.slug, chapterId: item.chapterId })}
-                  className="w-full flex items-center justify-between p-6 rounded-[2rem] bg-white/5 border border-white/5 hover:bg-white/10 hover:border-primary/20 transition-all group"
+            {history.map((item, index) => {
+              const novel = novels.find(n => n.slug === item.slug);
+              const displayTitle = novel?.title || item.novelTitle;
+              
+              return (
+                <motion.div
+                  key={`${item.slug}-${item.timestamp}`}
+                  initial={{ opacity: 0, y: 10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0, scale: 0.95 }}
+                  transition={{ delay: index * 0.03, duration: 0.4 }}
                 >
-                  <div className="space-y-2 text-left">
-                    <h3 className="font-display font-black text-lg md:text-xl uppercase tracking-tight group-hover:text-primary transition-colors line-clamp-1">
-                      {item.novelTitle}
-                    </h3>
-                    <div className="flex items-center gap-4 text-[10px] font-black uppercase tracking-widest text-muted-foreground">
-                      <div className="flex items-center gap-1.5 px-2 py-0.5 rounded-md bg-primary/10 text-primary">
-                        <span>Bölüm {item.chapterId}</span>
-                      </div>
-                      <div className="flex items-center gap-2">
-                        <Clock className="w-3.5 h-3.5" />
-                        <span>{formatDistanceToNow(item.timestamp, { addSuffix: true, locale: tr })}</span>
+                  <button
+                    onClick={() => onNavigate('READER', { slug: item.slug, chapterId: item.chapterId })}
+                    className="w-full flex items-center justify-between p-6 rounded-[2rem] bg-white/5 border border-white/5 hover:bg-white/10 hover:border-primary/20 transition-all group"
+                  >
+                    <div className="space-y-2 text-left">
+                      <h3 className="font-display font-black text-lg md:text-xl uppercase tracking-tight group-hover:text-primary transition-colors line-clamp-1">
+                        {displayTitle}
+                      </h3>
+                      <div className="flex items-center gap-4 text-[10px] font-black uppercase tracking-widest text-muted-foreground">
+                        <div className="flex items-center gap-1.5 px-2 py-0.5 rounded-md bg-primary/10 text-primary">
+                          <span>Bölüm {item.chapterId}</span>
+                        </div>
+                        <div className="flex items-center gap-2">
+                          <Clock className="w-3.5 h-3.5" />
+                          <span>{formatDistanceToNow(item.timestamp, { addSuffix: true, locale: tr })}</span>
+                        </div>
                       </div>
                     </div>
-                  </div>
-                  <div className="w-10 h-10 rounded-full border border-white/10 flex items-center justify-center group-hover:bg-primary group-hover:border-primary transition-all">
-                    <ChevronRight className="w-5 h-5 text-[#8E8E93] group-hover:text-white transition-transform group-hover:translate-x-1" />
-                  </div>
-                </button>
-              </motion.div>
-            ))}
+                    <div className="w-10 h-10 rounded-full border border-white/10 flex items-center justify-center group-hover:bg-primary group-hover:border-primary transition-all">
+                      <ChevronRight className="w-5 h-5 text-[#8E8E93] group-hover:text-white transition-transform group-hover:translate-x-1" />
+                    </div>
+                  </button>
+                </motion.div>
+              );
+            })}
           </AnimatePresence>
         </div>
       )}

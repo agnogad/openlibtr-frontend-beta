@@ -114,11 +114,11 @@ export default function MainApp() {
       case 'LIBRARY':
         return <LibraryView onNavigate={handleNavigate} novels={novels} history={history} searchQuery={searchQuery} />;
       case 'NOVEL_DETAIL':
-        return <NovelDetailView slug={view.params.slug} onNavigate={handleNavigate} history={history} />;
+        return <NovelDetailView slug={view.params.slug} onNavigate={handleNavigate} history={history} novels={novels} />;
       case 'READER':
-        return <ReaderView slug={view.params.slug} chapterId={view.params.chapterId} onNavigate={handleNavigate} />;
+        return <ReaderView slug={view.params.slug} chapterId={view.params.chapterId} onNavigate={handleNavigate} novels={novels} />;
       case 'HISTORY':
-        return <HistoryView onNavigate={handleNavigate} initialHistory={history} />;
+        return <HistoryView onNavigate={handleNavigate} initialHistory={history} novels={novels} />;
       case 'PROFILE':
         return <ProfileView onNavigate={handleNavigate} />;
       case 'LOGIN':

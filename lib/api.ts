@@ -60,7 +60,11 @@ async function fetchWithCache<T>(url: string, isText: boolean = false): Promise<
     return cached.data;
   }
 
-  const response = await fetch(url);
+  // Add 5-minute windowed cache buster to bypass browser/proxy caches
+  const cacheBuster = Math.floor(now / CACHE_DURATION);
+  const finalUrl = `${url}${url.includes('?') ? '&' : '?'}cb=${cacheBuster}`;
+
+  const response = await fetch(finalUrl);
   if (!response.ok) throw new Error(`Failed to fetch: ${url}`);
   
   const data = isText ? await response.text() : await response.json();

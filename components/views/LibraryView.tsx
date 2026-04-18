@@ -20,8 +20,14 @@ export function LibraryView({ onNavigate, novels, history, searchQuery }: Librar
   const featuredNovels = useMemo(() => novels.slice(0, 3), [novels]);
   
   const resumeData = useMemo(() => {
-    return history.length > 0 ? history[0] : null;
-  }, [history]);
+    if (history.length === 0) return null;
+    const item = history[0];
+    const novel = novels.find(n => n.slug === item.slug);
+    return {
+      ...item,
+      novelTitle: novel?.title || item.novelTitle
+    };
+  }, [history, novels]);
 
   const filteredNovels = novels.filter(novel => 
     novel.title.toLowerCase().includes(searchQuery.toLowerCase())
