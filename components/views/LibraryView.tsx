@@ -17,21 +17,29 @@ interface LibraryViewProps {
 }
 
 export function LibraryView({ onNavigate, novels, history, searchQuery }: LibraryViewProps) {
-  const featuredNovels = useMemo(() => novels.slice(0, 3), [novels]);
+  const sortedNovels = useMemo(() => {
+    return [...novels].sort((a, b) => 
+      new Date(b.lastUpdated).getTime() - new Date(a.lastUpdated).getTime()
+    );
+  }, [novels]);
+
+  const featuredNovels = useMemo(() => sortedNovels.slice(0, 3), [sortedNovels]);
   
   const resumeData = useMemo(() => {
     if (history.length === 0) return null;
     const item = history[0];
-    const novel = novels.find(n => n.slug === item.slug);
+    const novel = sortedNovels.find(n => n.slug === item.slug);
     return {
       ...item,
       novelTitle: novel?.title || item.novelTitle
     };
-  }, [history, novels]);
+  }, [history, sortedNovels]);
 
-  const filteredNovels = novels.filter(novel => 
-    novel.title.toLowerCase().includes(searchQuery.toLowerCase())
-  );
+  const filteredNovels = useMemo(() => {
+    return sortedNovels.filter(novel => 
+      novel.title.toLowerCase().includes(searchQuery.toLowerCase())
+    );
+  }, [sortedNovels, searchQuery]);
 
   return (
     <div className="space-y-12 pb-20">
