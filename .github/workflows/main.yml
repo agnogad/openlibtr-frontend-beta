@@ -1,4 +1,4 @@
-name: Build Next.js Standalone
+name: Build Next.js Standalone & Binary
 
 on:
   push:
@@ -6,7 +6,7 @@ on:
       - main
 
 permissions:
-  contents: write   # 🔥 BU SATIR ÖNEMLİ
+  contents: write
 
 jobs:
   build:
@@ -28,10 +28,18 @@ jobs:
       - name: Build al
         run: npm run build
 
+      - name: Binary Oluştur (ARM64)
+        run: |
+          # Standalone klasörüne girip binary'yi orada üretmek yolları kısaltır
+          cd .next/standalone
+          # npx kullanarak sistemdeki diğer 'pkg' komutuyla çakışmayı önlüyoruz
+          npx pkg server.js --targets node20-linux-arm64 --output ../../next-app-arm64
+
       - name: Standalone çıktıyı hazırla
         run: |
           mkdir -p output/.next
 
+          # Standalone dosyalarını kopyala
           if [ -d ".next/standalone" ]; then
             cp -r .next/standalone/* output/
           else
@@ -39,6 +47,7 @@ jobs:
             exit 1
           fi
 
+          # Statik dosyaları kopyala
           if [ -d ".next/static" ]; then
             cp -r .next/static output/.next/
           fi
@@ -46,6 +55,9 @@ jobs:
           if [ -d "public" ]; then
             cp -r public output/
           fi
+          
+          # Ürettiğimiz Binary dosyasını da output klasörüne taşı
+          mv next-app-arm64 output/
 
       - name: Build branch'e push et
         run: |
@@ -55,7 +67,7 @@ jobs:
           git config user.email "actions@github.com"
 
           git add .
-          git commit -m "Build output"
+          git commit -m "Build output with ARM64 binary"
 
           git branch -M build
           git remote add origin https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}
