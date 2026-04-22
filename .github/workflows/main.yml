@@ -1,0 +1,46 @@
+name: Build Next.js Standalone
+
+on:
+  push:
+    branches:
+      - main  # hangi branch'ten build alınacaksa değiştir
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Repo'yu çek
+        uses: actions/checkout@v4
+
+      - name: Node kur
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: Dependency kur
+        run: npm install
+
+      - name: Build al
+        run: npm run build
+
+      - name: Standalone çıktıyı hazırla
+        run: |
+          mkdir output
+          cp -r .next/standalone/* output/
+          cp -r .next/static output/.next/
+          cp -r public output/
+
+      - name: Build branch'e push et
+        run: |
+          cd output
+          git init
+          git config user.name "github-actions"
+          git config user.email "actions@github.com"
+          git add .
+          git commit -m "Build output"
+
+          git branch -M build
+          git remote add origin https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}
+
+          git push -f origin build
