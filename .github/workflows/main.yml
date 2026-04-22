@@ -19,7 +19,7 @@ jobs:
       - name: Node kur
         uses: actions/setup-node@v4
         with:
-          node-version: 20
+          node-version: 18
           cache: "npm"
 
       - name: Dependency kur
@@ -33,7 +33,7 @@ jobs:
           # Standalone klasörüne girip binary'yi orada üretmek yolları kısaltır
           cd .next/standalone
           # npx kullanarak sistemdeki diğer 'pkg' komutuyla çakışmayı önlüyoruz
-          npx pkg server.js --targets node20-linux-arm64 --output ../../next-app-arm64
+          npx pkg server.js --targets node18-linux-arm64 --output ../../next-app-arm64
 
       - name: Standalone çıktıyı hazırla
         run: |
