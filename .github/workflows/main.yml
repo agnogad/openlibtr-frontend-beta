@@ -3,7 +3,10 @@ name: Build Next.js Standalone
 on:
   push:
     branches:
-      - main   # ihtiyacına göre değiştir
+      - main
+
+permissions:
+  contents: write   # 🔥 BU SATIR ÖNEMLİ
 
 jobs:
   build:
@@ -29,7 +32,6 @@ jobs:
         run: |
           mkdir -p output/.next
 
-          # standalone server files
           if [ -d ".next/standalone" ]; then
             cp -r .next/standalone/* output/
           else
@@ -37,12 +39,10 @@ jobs:
             exit 1
           fi
 
-          # static files
           if [ -d ".next/static" ]; then
             cp -r .next/static output/.next/
           fi
 
-          # public (opsiyonel)
           if [ -d "public" ]; then
             cp -r public output/
           fi
