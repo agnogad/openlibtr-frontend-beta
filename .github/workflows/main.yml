@@ -3,7 +3,7 @@ name: Build Next.js Standalone
 on:
   push:
     branches:
-      - main  # hangi branch'ten build alınacaksa değiştir
+      - main   # ihtiyacına göre değiştir
 
 jobs:
   build:
@@ -17,6 +17,7 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: 20
+          cache: "npm"
 
       - name: Dependency kur
         run: npm install
@@ -26,10 +27,25 @@ jobs:
 
       - name: Standalone çıktıyı hazırla
         run: |
-          mkdir output
-          cp -r .next/standalone/* output/
-          cp -r .next/static output/.next/
-          cp -r public output/
+          mkdir -p output/.next
+
+          # standalone server files
+          if [ -d ".next/standalone" ]; then
+            cp -r .next/standalone/* output/
+          else
+            echo "Standalone build bulunamadı!"
+            exit 1
+          fi
+
+          # static files
+          if [ -d ".next/static" ]; then
+            cp -r .next/static output/.next/
+          fi
+
+          # public (opsiyonel)
+          if [ -d "public" ]; then
+            cp -r public output/
+          fi
 
       - name: Build branch'e push et
         run: |
@@ -37,6 +53,7 @@ jobs:
           git init
           git config user.name "github-actions"
           git config user.email "actions@github.com"
+
           git add .
           git commit -m "Build output"
 
